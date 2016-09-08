@@ -27,6 +27,13 @@ while(!Thread.interrupted()){
 
 ```
 
+More complex example showing :
+
+ - how to compile sass file on change
+ - how to compile all main files when an include file changes.
+ - how to avoid redundant compilation when burst change occurs 
+ _(some editors might triger more than one change event in few miliseconds time)_
+
 ```java
 
 // tweak this depending how responsive you want to be, but to still catch some duplicate changes
