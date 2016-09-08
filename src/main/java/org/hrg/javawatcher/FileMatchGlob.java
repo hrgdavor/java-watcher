@@ -47,12 +47,6 @@ public class FileMatchGlob implements FileMatcher{
 		this.rootString = rootPath.toString().replace('\\', '/');
 	}
 
-	public void addIncludes(Collection<String> globs){
-		for (String glob : globs) {
-			includes.add(makeRule(glob));
-		}
-	}
-
 	/**
 	 * Generate PathMatcher based on the rule. If the rule starts with {@code regex:} then it is used unchanged.
 	 * The default is the glob syntax, and in that case prefix {@code glob:}+{@code root}+{@code /} is added so the glob
@@ -65,22 +59,32 @@ public class FileMatchGlob implements FileMatcher{
 		return FileSystems.getDefault().getPathMatcher("glob:"+rootString+"/"+rule);
 	}
 
-	public void addIncludes(String ... globs){
+	public FileMatchGlob includes(Collection<String> globs){
 		for (String glob : globs) {
 			includes.add(makeRule(glob));
 		}
+		return this;
 	}
 
-	public void addExcludes(Collection<String> globs){
+	public FileMatchGlob includes(String ... globs){
+		for (String glob : globs) {
+			includes.add(makeRule(glob));
+		}
+		return this;
+	}
+
+	public FileMatchGlob excludes(Collection<String> globs){
 		for (String glob : globs) {
 			excludes.add(makeRule(glob));
 		}
+		return this;
 	}
 	
-	public void addExcludes(String ... globs){
+	public FileMatchGlob excludes(String ... globs){
 		for (String glob : globs) {
 			excludes.add(makeRule(glob));
 		}
+		return this;
 	}
 
 	/**
