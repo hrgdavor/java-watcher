@@ -68,6 +68,7 @@ folderWatcher.add(includeFiles);
 folderWatcher.init(true);
 
 Collection<FileChangeEntry<FileMatchGlob>> changedFiles = null;
+long pollWait;
 
 while(!Thread.interrupted()){
 	
@@ -91,8 +92,13 @@ while(!Thread.interrupted()){
 		}
 	}
 	
-	changedFiles = folderWatcher.poll( changedFiles == null ?  
-			threadInterruptCheckInterval : burstChangeWait, TimeUnit.MILLISECONDS);
+	pollWait = changedFiles == null ?
+			// if no files changed wait: threadInterruptCheckInterval to allow the thread to be interrupted
+			threadInterruptCheckInterval : 
+			// if some files just changed, wait: burstChangeWait to allow for burst changes to be handled in batch 
+			burstChangeWait;
+			
+	changedFiles = folderWatcher.poll(pollWait,	TimeUnit.MILLISECONDS);
 }
 
 
