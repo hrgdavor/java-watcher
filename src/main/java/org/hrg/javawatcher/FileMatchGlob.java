@@ -1,13 +1,8 @@
 package org.hrg.javawatcher;
 
-import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -24,6 +19,10 @@ import org.slf4j.LoggerFactory;
  *  */
 public class FileMatchGlob implements FileMatcher{
 
+	private static final String NOT_COLLECTING_EXCLUDED = "This matcher is not collecting excluded files. Override this method if you do not want exception thrown. ";
+
+	private static final String NOT_COLLECTING_MATCHES = "This matcher is not collecting matches. Override this method if you do not want exception thrown. ";
+
 	static final Logger log = LoggerFactory.getLogger(FileMatchGlob.class);
 
     protected String rootString;
@@ -34,8 +33,10 @@ public class FileMatchGlob implements FileMatcher{
 	protected volatile boolean started = false;
 	protected Path rootPath;
 
+	protected boolean collectMatched = false;
 	protected Set<Path> matched = new TreeSet<>(); 
-	protected Set<Path> skipped = new TreeSet<>(); 
+	protected boolean collectExcluded = false;
+	protected Set<Path> excluded = new TreeSet<>(); 
 
 	public FileMatchGlob(Path root, boolean recursive){
 		this.rootPath = root;
@@ -89,55 +90,52 @@ public class FileMatchGlob implements FileMatcher{
 
 	/**
 	 * Get the current collection of files offered and accepted based on the rules.
+	 * You must {@link #setCollectMatched(boolean)} during initialisation, or the list will be empty.
 	 * */
 	public Collection<Path> getMatched(){
+		if(!collectMatched) throw new RuntimeException(NOT_COLLECTING_MATCHES+toString());
 		return matched;
 	}
 
 	public int getMatchedCount(){
+		if(!collectMatched) throw new RuntimeException(NOT_COLLECTING_MATCHES+toString());
 		return matched.size();
 	}
 
 	/**
 	 * Get the current collection of files offered but excluded based on the rules.
+	 * You must {@link #setCollectMatched(boolean)} during initialisation, or the list will be empty.
 	 * */
-	public Collection<Path> getSkipped(){
-		return matched;
+	public Collection<Path> getExcluded(){
+		if(!collectExcluded) throw new RuntimeException(NOT_COLLECTING_EXCLUDED+toString());
+		return excluded;
 	}
 	
-	public int getSkippedCount(){
-		return matched.size();
+	public int getExcludedCount(){
+		if(!collectExcluded) throw new RuntimeException(NOT_COLLECTING_EXCLUDED+toString());
+		return excluded.size();
 	}
 
-	Object fillLock = new Object();
-	public void fill(){
-		synchronized (fillLock) {
-			try {
-				Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
-					@Override
-					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-						offer(file);
-						return FileVisitResult.CONTINUE;
-					}
-					
-					@Override
-					public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-						return (recursive && !excluded(dir)) || dir.equals(rootPath) ? 
-								super.preVisitDirectory(dir, attrs): FileVisitResult.SKIP_SUBTREE;
-					}
+	public boolean isCollectExcluded() {
+		return collectExcluded;
+	}
+	
+	public boolean isCollectMatched() {
+		return collectMatched;
+	}
 
-					@Override
-					public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-						return FileVisitResult.CONTINUE;
-					}
-					
-				});
-			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage(),e);
-			}
-			
-		}
-		
+	/**
+	 * Are excluded files for later listing. Use when you want to know what files were excluded.
+	 * */
+	public void setCollectExcluded(boolean collectExcluded) {
+		this.collectExcluded = collectExcluded;
+	}
+	
+	/**
+	 * Are matched files for later listing. Use when you want to know what were collected.
+	 * */
+	public void setCollectMatched(boolean collectMatched) {
+		this.collectMatched = collectMatched;
 	}
 	
 	// -------------------------- implements FolderGlob ------- interface --------------------------
@@ -174,14 +172,14 @@ public class FileMatchGlob implements FileMatcher{
 	@Override
 	public void fileDeleted(Path path){
 		matched.remove(path);
-		skipped.remove(path);
+		excluded.remove(path);
 	}
 	
 	/** {@inheritDoc} */
 	@Override
 	public void dirInvalid(Path path){
 		removeAllFromDir(path, matched);
-		removeAllFromDir(path, skipped);
+		removeAllFromDir(path, excluded);
 	}
 	
 	/** {@inheritDoc} */
@@ -200,10 +198,10 @@ public class FileMatchGlob implements FileMatcher{
 	@Override
 	public boolean offer(Path file) {
         if (matches(file)) {
-            matched.add(file);
+            if(collectMatched) matched.add(file);
             return true;
         } else{
-        	skipped.add(file);
+        	if(collectExcluded) excluded.add(file);
         	return false;
         }
 	}
@@ -211,6 +209,6 @@ public class FileMatchGlob implements FileMatcher{
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return "FileMatchGlob";
+		return "FileMatchGlob:"+rootString;
 	}	
 }

@@ -199,6 +199,41 @@ public class FolderWatcher<F extends FileMatcher> {
 		
 	}
 	
+	/** 
+	 * Collect all files accepted by the matcher, starting with rootPath of the matcher
+	 * an checking recursively if the matcher is defined as such. Used when you just
+	 *  want to check which files the matcher targets.
+	 * */
+	public void fillMatcher(final FileMatcher matcher){
+		try {
+			
+			final boolean recursive = matcher.isRecursive();
+			final Path rootPath = matcher.getRootPath();
+	
+			Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					matcher.offer(file);
+					return FileVisitResult.CONTINUE;
+				}
+				
+				@Override
+				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+					return (recursive && !matcher.excluded(dir)) || dir.equals(rootPath) ? 
+							super.preVisitDirectory(dir, attrs): FileVisitResult.SKIP_SUBTREE;
+				}
+
+				@Override
+				public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+					return FileVisitResult.CONTINUE;
+				}
+				
+			});
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage(),e);
+		}			
+	}
+
 	/**
 	 * Collect all files from the WatchKey.
 	 * 

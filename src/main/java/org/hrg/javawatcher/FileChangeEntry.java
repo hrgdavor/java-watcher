@@ -29,7 +29,7 @@ public class FileChangeEntry<T extends FileMatcher> {
 		return file;
 	}
 	
-	/** FolderGlob that was listening for changes on this file when change occured */
+	/** FolderGlob that was listening for changes on this file when change occurred */
 	public T getMatcher() {
 		return matcher;
 	}

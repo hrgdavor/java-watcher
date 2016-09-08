@@ -14,7 +14,7 @@ public interface FileMatcher {
 	 * 
 	 * @param path 
 	 * 
-	 * @return true if matched by defined include rules
+	 * @return true if matched by defined rules
 	 * */
 	public boolean matches(Path path);
 
@@ -22,13 +22,13 @@ public interface FileMatcher {
 	 * 
 	 * @param path 
 	 * 
-	 * @return true if mathched by defined exclude rules 
+	 * @return true if matched by defined exclude rules 
 	 * */
 	public boolean excluded(Path path);
 
 	/** Check if the provided path is a match and store in internal include/exclude lists.
 	 * 
-	 * Implementations that do not want to store matched/skipped paths can just return result from {@link #matches(Path)}
+	 * Implementations that do not want to store matched/excluded paths can just return result from {@link #matches(Path)}
 	 * 
 	 * @param path 
 	 * 
@@ -39,14 +39,14 @@ public interface FileMatcher {
 	/**
 	 * Method that will be called when a previously existing folder is deleted, allowing maintenance of live files list.
 	 * 
-	 * Implementations that do not want to store matched/skipped paths can just leave method empty
+	 * Implementations that do not want to store matched/excluded paths can just leave method empty
 	 * */
 	public void dirInvalid(Path path);
 
 	/**
 	 * Method that will be called when a previously existing file is deleted, allowing maintenance of live files list.
 	 * 
-	 * Implementations that do not want to store matched/skipped paths can just leave method empty
+	 * Implementations that do not want to store matched/excluded paths can just leave method empty
 	 * */
 	public void fileDeleted(Path path);
 	
