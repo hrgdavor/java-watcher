@@ -42,15 +42,15 @@ public class ComplexCompileExample {
 		
 		// if we do not define rules, then any file found will be accepted
 		// match any .scss file in root folder
-		sourceFiles.addIncludes("*.scss");
+		sourceFiles.includes("*.scss");
 		
 		// we want to know which files are fouond later on when an include changes
 		sourceFiles.setCollectMatched(true);
 
 		// create matcher on scss folder also checking sub-folders
 		FileMatchGlob includeFiles = new FileMatchGlob(Paths.get("./scss"), true);
-		includeFiles.addIncludes("*.scss");// only matches root folder
-		includeFiles.addIncludes("**/*.scss");// all scss files in subfolders 
+		// "*.scss" only matches root folder, so extra rule is needed for subfolders
+		includeFiles.includes("*.scss","**/*.scss");
 		// I have not yet found an easy way to say this in single rule (will change example if I find a better way)
 		
 		folderWatcher.add(sourceFiles);
