@@ -204,7 +204,7 @@ public class FolderWatcher<F extends FileMatcher> {
 	 * an checking recursively if the matcher is defined as such. Used when you just
 	 *  want to check which files the matcher targets.
 	 * */
-	public void fillMatcher(final FileMatcher matcher){
+	public static void fillMatcher(final FileMatcher matcher){
 		try {
 			
 			final boolean recursive = matcher.isRecursive();

@@ -1,3 +1,9 @@
+#Introduction
+Utility for watching file changes using Java 7 WatchService. Written to allow myself working with
+file matching and file watching that feels more natural to me.
+
+You could find it useful as a library, or just read source for examples of using Java 7 WatchService. 
+
 #Usage
 
 Simple example showing how to compile sass file on change
@@ -23,6 +29,28 @@ while(!Thread.interrupted()){
 	for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {
 		compileSass(changed.getPath());
 	}
+}
+
+```
+
+Example showing how to find files using {@link FileMatchGlob} by adding few include/exclude rules
+
+```
+// create matcher on current folder also checking sub-folders
+FileMatchGlob matcher = new FileMatchGlob(Paths.get("./"), true);
+
+// if we do not define rules, then any file found will be accepted
+// match any .scss file in root folder
+matcher.includes("*.scss","**/*.scss").excludes(".sass-cache");
+
+// by default matcher does not store matched or excluded files 
+matcher.setCollectMatched(true);
+matcher.setCollectExcluded(true);
+
+FolderWatcher.fillMatcher(matcher);
+
+for(Path path :matcher.getMatched()){
+	System.out.println("found: "+path);
 }
 
 ```
