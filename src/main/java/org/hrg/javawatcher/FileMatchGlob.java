@@ -13,7 +13,10 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** {@link FileMatcher} implementation that uses glob syntax.
+/** 
+ * {@link FileMatcher} implementation that uses glob syntax by default. 
+ * The rule can be a regex if prefixed with {@code regex:} (see: {@link #makeRule(String)}).
+ * 
  * 
  *  @see {@link <a href="https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob">What is a glob</a>}
  *  */
@@ -46,25 +49,37 @@ public class FileMatchGlob implements FileMatcher{
 
 	public void addIncludes(Collection<String> globs){
 		for (String glob : globs) {
-			includes.add(FileSystems.getDefault().getPathMatcher("glob:"+rootString+"/"+glob));
+			includes.add(makeRule(glob));
 		}
+	}
+
+	/**
+	 * Generate PathMatcher based on the rule. If the rule starts with {@code regex:} then it is used unchanged.
+	 * The default is the glob syntax, and in that case prefix {@code glob:}+{@code root}+{@code /} is added so the glob
+	 * works as expected. The default glob syntax is relative to root of the matcher, but {@code regex} must assume the 
+	 * full path to the file. You can however add root to the {@code regex} where desired yourself. 
+	 * 
+	 * */
+	public PathMatcher makeRule(String rule){
+		if(rule.startsWith("regex:")) return FileSystems.getDefault().getPathMatcher(rule);
+		return FileSystems.getDefault().getPathMatcher("glob:"+rootString+"/"+rule);
 	}
 
 	public void addIncludes(String ... globs){
 		for (String glob : globs) {
-			includes.add(FileSystems.getDefault().getPathMatcher("glob:"+rootString+"/"+glob));
+			includes.add(makeRule(glob));
 		}
 	}
 
 	public void addExcludes(Collection<String> globs){
 		for (String glob : globs) {
-			excludes.add(FileSystems.getDefault().getPathMatcher("glob:"+rootString+"/"+glob));
+			excludes.add(makeRule(glob));
 		}
 	}
 	
 	public void addExcludes(String ... globs){
 		for (String glob : globs) {
-			excludes.add(FileSystems.getDefault().getPathMatcher("glob:"+rootString+"/"+glob));
+			excludes.add(makeRule(glob));
 		}
 	}
 

@@ -9,7 +9,7 @@ import java.nio.file.Path;
  * */
 public class FileChangeEntry<T extends FileMatcher> {
 	
-	/** @see {@link #getFile()} */
+	/** @see {@link #getPath()} */
 	private final Path file;
 
 	/** @see {@link #getMatcher()} */
@@ -24,8 +24,8 @@ public class FileChangeEntry<T extends FileMatcher> {
 		this.matcher = matcher;
 	}
 	 
-	/** File that changed */
-	public Path getFile() {
+	/** Path to file that changed */
+	public Path getPath() {
 		return file;
 	}
 	

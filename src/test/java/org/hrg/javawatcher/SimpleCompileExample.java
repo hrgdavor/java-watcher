@@ -1,8 +1,22 @@
-#Usage
+package org.hrg.javawatcher;
 
-Simple example showing how to compile sass file on change
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
 
-```java
+import org.hrg.javawatcher.FileChangeEntry;
+import org.hrg.javawatcher.FileMatchGlob;
+import org.hrg.javawatcher.FolderWatcher;
+
+/**
+ *  Incomplete example showing how to compile sass file on change.
+ *  The compilation step is omitted to make it simple to understand
+ *  what this library does.
+ * */
+public class SimpleCompileExample {
+
+	public static void main(String[] args) {
+		
 		FolderWatcher<FileMatchGlob> folderWatcher = new FolderWatcher<>();
 		// create matcher on current folder without checking sub-folders
 		FileMatchGlob matcher = new FileMatchGlob(Paths.get("./"), false);
@@ -23,9 +37,10 @@ Simple example showing how to compile sass file on change
 				compileSass(changed.getPath());
 			}
 		}
+	}
 
-```
-
-## License
-
-See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
+	static void compileSass(Path sassFile){
+		System.out.println("compile: "+sassFile);
+		// implement compilation here
+	}
+}
