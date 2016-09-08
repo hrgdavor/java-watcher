@@ -83,7 +83,8 @@ public class ComplexCompileExample {
 				}
 			}
 			
-			changedFiles = folderWatcher.poll( changedFiles == null ?  threadInterruptCheckInterval : burstChangeWait, TimeUnit.MILLISECONDS);
+			changedFiles = folderWatcher.poll( changedFiles == null ?  
+					threadInterruptCheckInterval : burstChangeWait, TimeUnit.MILLISECONDS);
 		}
 	}
 

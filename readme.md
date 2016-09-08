@@ -3,13 +3,14 @@
 Simple example showing how to compile sass file on change
 
 ```java
+
 FolderWatcher<FileMatchGlob> folderWatcher = new FolderWatcher<>();
 // create matcher on current folder without checking sub-folders
 FileMatchGlob matcher = new FileMatchGlob(Paths.get("./"), false);
 
 // if we do not define rules, then any file found will be accepted
 // match any .scss file in root folder
-matcher.addIncludes("*.scss");
+matcher.includes("*.scss");
 
 folderWatcher.add(matcher);
 
@@ -27,6 +28,7 @@ while(!Thread.interrupted()){
 ```
 
 ```java
+
 // tweak this depending how responsive you want to be, but to still catch some duplicate changes
 long burstChangeWait = 20;
 long threadInterruptCheckInterval = 1000;
@@ -41,15 +43,15 @@ FileMatchGlob sourceFiles = new FileMatchGlob(Paths.get("./"), false);
 
 // if we do not define rules, then any file found will be accepted
 // match any .scss file in root folder
-sourceFiles.addIncludes("*.scss");
+sourceFiles.includes("*.scss");
 
 // we want to know which files are fouond later on when an include changes
 sourceFiles.setCollectMatched(true);
 
 // create matcher on scss folder also checking sub-folders
 FileMatchGlob includeFiles = new FileMatchGlob(Paths.get("./scss"), true);
-includeFiles.addIncludes("*.scss");// only matches root folder
-includeFiles.addIncludes("**/*.scss");// all scss files in subfolders 
+// "*.scss" only matches root folder, so extra rule is needed for subfolders
+includeFiles.includes("*.scss","**/*.scss");
 // I have not yet found an easy way to say this in single rule (will change example if I find a better way)
 
 folderWatcher.add(sourceFiles);
@@ -85,6 +87,7 @@ while(!Thread.interrupted()){
 	changedFiles = folderWatcher.poll( changedFiles == null ?  
 			threadInterruptCheckInterval : burstChangeWait, TimeUnit.MILLISECONDS);
 }
+
 
 ```
 
