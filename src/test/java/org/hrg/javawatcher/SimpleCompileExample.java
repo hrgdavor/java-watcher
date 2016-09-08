@@ -23,7 +23,7 @@ public class SimpleCompileExample {
 
 		// if we do not define rules, then any file found will be accepted
 		// match any .scss file in root folder
-		matcher.addIncludes("*.scss");
+		matcher.includes("*.scss");
 
 		folderWatcher.add(matcher);
 		
