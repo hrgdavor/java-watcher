@@ -35,7 +35,8 @@ while(!Thread.interrupted()){
 
 Example showing how to find files using {@link FileMatchGlob} by adding few include/exclude rules
 
-```
+```java
+
 // create matcher on current folder also checking sub-folders
 FileMatchGlob matcher = new FileMatchGlob(Paths.get("./"), true);
 
