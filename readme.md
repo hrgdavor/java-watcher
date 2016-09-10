@@ -15,7 +15,7 @@ FolderWatcher<FileMatchGlob> folderWatcher = new FolderWatcher<>();
 FileMatchGlob matcher = new FileMatchGlob(Paths.get("./"), false);
 
 // if we do not define rules, then any file found will be accepted
-// match any .scss file in root folder
+// match any .scss file in root folder, and any .scss in subfolders
 matcher.includes("*.scss");
 
 folderWatcher.add(matcher);
@@ -46,7 +46,6 @@ matcher.includes("*.scss","**/*.scss").excludes(".sass-cache");
 
 // by default matcher does not store matched or excluded files 
 matcher.setCollectMatched(true);
-matcher.setCollectExcluded(true);
 
 FolderWatcher.fillMatcher(matcher);
 

@@ -19,12 +19,11 @@ public class SimpleFindFiles {
 		FileMatchGlob matcher = new FileMatchGlob(Paths.get("./"), true);
 
 		// if we do not define rules, then any file found will be accepted
-		// match any .scss file in root folder
+		// match any .scss file in root folder, and any .scss in subfolders
 		matcher.includes("*.scss","**/*.scss").excludes(".sass-cache");
 
 		// by default matcher does not store matched or excluded files 
 		matcher.setCollectMatched(true);
-		matcher.setCollectExcluded(true);
 
 		FolderWatcher.fillMatcher(matcher);
 		
