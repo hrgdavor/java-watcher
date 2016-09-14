@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
  *  */
 public class FileMatchGlob implements FileMatcher{
 
-	private static final String NOT_COLLECTING_EXCLUDED = "This matcher is not collecting excluded files. Override this method if you do not want exception thrown. ";
+	private static final String NOT_COLLECTING_EXCLUDED = "This matcher is not collecting excluded files. Call setCollectExcluded(true) or override this method if you do not want exception thrown. ";
 
-	private static final String NOT_COLLECTING_MATCHES = "This matcher is not collecting matches. Override this method if you do not want exception thrown. ";
+	private static final String NOT_COLLECTING_MATCHES = "This matcher is not collecting matches. Call setCollectMatched(true) or override this method if you do not want exception thrown. ";
 
 	static final Logger log = LoggerFactory.getLogger(FileMatchGlob.class);
 
