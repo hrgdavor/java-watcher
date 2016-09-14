@@ -41,17 +41,17 @@ public class ComplexCompileExample {
 		FileMatchGlob sourceFiles = new FileMatchGlob(Paths.get("./"), false);
 		
 		// if we do not define rules, then any file found will be accepted
-		// match any .scss file in root folder
+		// match any .scss file in root folder only
 		sourceFiles.includes("*.scss");
 		
-		// we want to know which files are fouond later on when an include changes
+		// sourceFiles.getMatched() does not work without this. And it must be set before folderWatcher.init(...)
 		sourceFiles.setCollectMatched(true);
 
-		// create matcher on scss folder also checking sub-folders
+		// create matcher for our folder that holds the include-files (recursive check sub-folders as well)
 		FileMatchGlob includeFiles = new FileMatchGlob(Paths.get("./scss"), true);
-		// "*.scss" only matches root folder, so extra rule is needed for subfolders
-		includeFiles.includes("*.scss","**/*.scss");
-		// I have not yet found an easy way to say this in single rule (will change example if I find a better way)
+		// "**.scss" matches in all folders and subfolders
+		includeFiles.includes("**.scss");
+		
 		
 		folderWatcher.add(sourceFiles);
 		folderWatcher.add(includeFiles);
@@ -65,8 +65,8 @@ public class ComplexCompileExample {
 		while(!Thread.interrupted()){
 			
 			if(changedFiles == null && !todo.isEmpty()){
-				// when poll(threadInterruptCheckInterval) returns some results
-				// and one of subsequent poll(burstChangeWait) returns null (no new burst changes) 
+				// once poll(threadInterruptCheckInterval) returns some results, we do not compile right away
+				// we wait one of subsequent poll(burstChangeWait) to return null (no new burst changes happened)
 				for(Path path: todo){
 					compileSass(path);
 				}
@@ -75,10 +75,10 @@ public class ComplexCompileExample {
 				for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {
 
 					if(changed.getMatcher() == includeFiles){
-						// if any file in include folder changes, we want to recompile all source sass files
+						// if any file in include folder changes, we want to recompile all source scss files
 						todo.addAll(sourceFiles.getMatched());						
 					}else{
-						// a source file changed, add it for recompilation
+						// a source file changed, add only it for recompilation
 						todo.add(changed.getPath());						
 					}
 				}
