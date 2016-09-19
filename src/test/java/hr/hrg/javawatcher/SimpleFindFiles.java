@@ -1,12 +1,12 @@
-package org.hrg.javawatcher;
+package hr.hrg.javawatcher;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 
-import org.hrg.javawatcher.FileChangeEntry;
-import org.hrg.javawatcher.FileMatchGlob;
-import org.hrg.javawatcher.FolderWatcher;
+import hr.hrg.javawatcher.FileChangeEntry;
+import hr.hrg.javawatcher.FileMatchGlob;
+import hr.hrg.javawatcher.FolderWatcher;
 
 /**
  *  Example showing how to find files using {@link FileMatchGlob}

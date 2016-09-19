@@ -1,4 +1,4 @@
-package org.hrg.javawatcher;
+package hr.hrg.javawatcher;
 
 import java.nio.file.Path;
 

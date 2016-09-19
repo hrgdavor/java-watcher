@@ -1,4 +1,4 @@
-package org.hrg.javawatcher;
+package hr.hrg.javawatcher;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-import org.hrg.javawatcher.FileChangeEntry;
-import org.hrg.javawatcher.FileMatchGlob;
-import org.hrg.javawatcher.FolderWatcher;
+import hr.hrg.javawatcher.FileChangeEntry;
+import hr.hrg.javawatcher.FileMatchGlob;
+import hr.hrg.javawatcher.FolderWatcher;
 
 /**<p>
  *  More complex example showing :

@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.hrg</groupId>
+	<groupId>hr.hrg</groupId>
 	<artifactId>java-watcher</artifactId>
 	<version>0.1.0</version>
 	<name>Java sass command line</name>
@@ -19,6 +19,29 @@
 		</dependency>
 
 	</dependencies>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>DAvor Hrg</name>
+			<email>hrgdavor@gmail.com</email>
+			<organization>Github</organization>
+			<organizationUrl>https://github.com/hrgdavor</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/hrgdavor/java-watcher.git</connection>
+		<developerConnection>scm:git:ssh://github.com:hrgdavor/java-watcher.git</developerConnection>
+		<url>http://github.com/hrgdavor/java-watcher/tree/master</url>
+	</scm>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -30,6 +53,48 @@
 					<optimize>true</optimize>
 				</configuration>
 			</plugin>
+		
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin -->
+   
 		</plugins>
 	</build>
 
