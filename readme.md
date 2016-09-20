@@ -6,22 +6,26 @@ You could find it useful as a library, or just read source for examples of using
 
 #Usage
 
-Simple example showing how to compile sass file on change [SimpleCompileExample](src/test/java/hr/hrg/javawatcher/SimpleCompileExample.java)
+[SimpleCompileExample.java](src/test/java/hr/hrg/javawatcher/SimpleCompileExample.java)
+is an example showing how to compile sass file on change 
+
 
 ```java
 
+// FolderWatcher is the utility that uses the WatchService but needs at least one FileMatcher
 FolderWatcher<FileMatchGlob> folderWatcher = new FolderWatcher<>();
-// create matcher on current folder without checking sub-folders
-FileMatchGlob matcher = new FileMatchGlob(Paths.get("./"), false);
 
-// if we do not define rules, then any file found will be accepted
-// match any .scss file in root folder, and any .scss in subfolders
-matcher.includes("*.scss");
+// in our case FileMatchGlob instance is used, and uses glob syntax
+// this one is configured for current folder without checking sub-folders (second param is false)
+FileMatchGlob matcher = folderWatcher.add(new FileMatchGlob(Paths.get("./"), false));
 
-folderWatcher.add(matcher);
+// if we do not define include rules, any file found will be accepted by the matcher
+// and we are interested in .scss files only
+matcher.includes("*.scss"); // this rule will match any .scss file directly in root folder
 
-//start watching, no configuration should happen after this as it wil give unexpected results
+// init with intention to watch the files after that
 folderWatcher.init(true);
+// no configuration should happen after the init or it will give unexpected results
 
 while(!Thread.interrupted()){
 	Collection<FileChangeEntry<FileMatchGlob>> changedFiles = folderWatcher.take();
@@ -33,7 +37,8 @@ while(!Thread.interrupted()){
 
 ```
 
-Example showing how to find files using {@link FileMatchGlob} by adding few include/exclude rules
+[SimpleFindFiles.java](src/test/java/hr/hrg/javawatcher/SimpleFindFiles.java)
+is an e xample showing how to find files using {@link FileMatchGlob} by adding few include/exclude rules.
 
 ```java
 
@@ -55,82 +60,13 @@ for(Path path :matcher.getMatched()){
 
 ```
 
-More complex example showing :
+[ComplexCompileExample.java](src/test/java/hr/hrg/javawatcher/ComplexCompileExample.java)
+is a more complex example showing :
 
  - how to compile sass file on change
  - how to compile all main files when an include file changes.
  - how to avoid redundant compilation when burst change occurs 
  _(some editors might triger more than one change event in few miliseconds time)_
-
-```java
-
-// tweak this depending how responsive you want to be, but to still catch some duplicate changes
-long burstChangeWait = 20;
-long threadInterruptCheckInterval = 1000;
-
-// for collecting files to compile, and to skip duplicates
-HashSet<Path> todo = new HashSet<>();
-
-FolderWatcher<FileMatchGlob> folderWatcher = new FolderWatcher<>();
-
-// create matcher on current folder without checking sub-folders
-FileMatchGlob sourceFiles = new FileMatchGlob(Paths.get("./"), false);
-
-// if we do not define rules, then any file found will be accepted
-// match any .scss file in root folder only
-sourceFiles.includes("*.scss");
-
-// sourceFiles.getMatched() does not work without this. And it must be set before folderWatcher.init(...)
-sourceFiles.setCollectMatched(true);
-
-// create matcher for our folder that holds the include-files (recursive check sub-folders as well)
-FileMatchGlob includeFiles = new FileMatchGlob(Paths.get("./scss"), true);
-// "**.scss" matches in all folders and subfolders
-includeFiles.includes("**.scss");
-
-
-folderWatcher.add(sourceFiles);
-folderWatcher.add(includeFiles);
-
-//start watching, no configuration should happen after this as it wil give unexpected results
-folderWatcher.init(true);
-
-Collection<FileChangeEntry<FileMatchGlob>> changedFiles = null;
-long pollWait;
-
-while(!Thread.interrupted()){
-	
-	if(changedFiles == null && !todo.isEmpty()){
-		// once poll(threadInterruptCheckInterval) returns some results, we do not compile right away
-		// we wait one of subsequent poll(burstChangeWait) to return null (no new burst changes happened)
-		for(Path path: todo){
-			compileSass(path);
-		}
-		todo.clear();
-	}else{
-		for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {
-
-			if(changed.getMatcher() == includeFiles){
-				// if any file in include folder changes, we want to recompile all source scss files
-				todo.addAll(sourceFiles.getMatched());						
-			}else{
-				// a source file changed, add only it for recompilation
-				todo.add(changed.getPath());						
-			}
-		}
-	}
-	
-	pollWait = changedFiles == null ?
-			// if no files changed wait: threadInterruptCheckInterval to allow the thread to be interrupted
-			threadInterruptCheckInterval : 
-			// if some files just changed, wait: burstChangeWait to allow for burst changes to be handled in batch 
-			burstChangeWait;
-			
-	changedFiles = folderWatcher.poll(pollWait,	TimeUnit.MILLISECONDS);
-}
-
-
-```
 
 
 

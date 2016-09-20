@@ -17,19 +17,21 @@ public class SimpleCompileExample {
 
 	public static void main(String[] args) {
 		
+		// FolderWatcher is the utility that uses the WatchService but needs at least one FileMatcher
 		FolderWatcher<FileMatchGlob> folderWatcher = new FolderWatcher<>();
-		// create matcher on current folder without checking sub-folders
-		FileMatchGlob matcher = new FileMatchGlob(Paths.get("./"), false);
 
-		// if we do not define rules, then any file found will be accepted
-		// match any .scss file in root folder
-		matcher.includes("*.scss");
-
-		folderWatcher.add(matcher);
+		// in our case FileMatchGlob instance is used, and uses glob syntax
+		// this one is configured for current folder without checking sub-folders (second param is false)
+		FileMatchGlob matcher = folderWatcher.add(new FileMatchGlob(Paths.get("./"), false));
 		
-		//start watching, no configuration should happen after this as it wil give unexpected results
+		// if we do not define include rules, any file found will be accepted by the matcher
+		// and we are interested in .scss files only
+		matcher.includes("*.scss"); // this rule will match any .scss file directly in root folder
+
+		// init with intention to watch the files after that
 		folderWatcher.init(true);
-		
+		// no configuration should happen after the init or it will give unexpected results
+
 		while(!Thread.interrupted()){
 			Collection<FileChangeEntry<FileMatchGlob>> changedFiles = folderWatcher.take();
 			
