@@ -45,9 +45,11 @@ public class FolderWatcher<F extends FileMatcher> {
 
     /**
      * Add a {@link FileMatcher} that will be used to watch files/folders
+     * @return 
      * */
-    public void add(F matcher){
+    public F add(F matcher){
     	matchers.add(matcher);
+    	return matcher;
     }
     
     /** 
