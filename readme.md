@@ -6,7 +6,7 @@ You could find it useful as a library, or just read source for examples of using
 
 #Usage
 
-Simple example showing how to compile sass file on change
+Simple example showing how to compile sass file on change [SimpleCompileExample](src/test/java/SimpleCompileExample.java)
 
 ```java
 
