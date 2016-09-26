@@ -6,6 +6,16 @@ You could find it useful as a library, or just read source for examples of using
 
 #Usage
 
+Add maven dependency or download from [maven central](http://repo1.maven.org/maven2/hr/hrg/java-watcher/)
+
+```
+<dependency>
+	<groupId>hr.hrg</groupId>
+	<artifactId>java-watcher</artifactId>
+	<version>0.1.0</version>
+</dependency>
+```
+
 [SimpleCompileExample.java](src/test/java/hr/hrg/javawatcher/SimpleCompileExample.java)
 is an example showing how to compile sass file on change 
 
