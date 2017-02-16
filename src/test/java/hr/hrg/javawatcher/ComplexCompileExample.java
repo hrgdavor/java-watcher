@@ -4,11 +4,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.TimeUnit;
-
-import hr.hrg.javawatcher.FileChangeEntry;
-import hr.hrg.javawatcher.FileMatchGlob;
-import hr.hrg.javawatcher.FolderWatcher;
 
 /**<p>
  *  More complex example showing :
@@ -30,7 +25,6 @@ public class ComplexCompileExample {
 
 		// tweak this depending how responsive you want to be, but to still catch some duplicate changes
 		long burstChangeWait = 20;
-		long threadInterruptCheckInterval = 1000;
 
 		// for collecting files to compile, and to skip duplicates
 		HashSet<Path> todo = new HashSet<>();
@@ -43,9 +37,6 @@ public class ComplexCompileExample {
 		// if we do not define rules, then any file found will be accepted
 		// match any .scss file in root folder only
 		sourceFiles.includes("*.scss");
-		
-		// sourceFiles.getMatched() does not work without this. And it must be set before folderWatcher.init(...)
-		sourceFiles.setCollectMatched(true);
 
 		// create matcher for our folder that holds the include-files (recursive check sub-folders as well)
 		FileMatchGlob includeFiles = new FileMatchGlob(Paths.get("./scss"), true);
@@ -60,37 +51,25 @@ public class ComplexCompileExample {
 		folderWatcher.init(true);
 		
 		Collection<FileChangeEntry<FileMatchGlob>> changedFiles = null;
-		long pollWait;
 		
 		while(!Thread.interrupted()){
-			
-			if(changedFiles == null && !todo.isEmpty()){
-				// once poll(threadInterruptCheckInterval) returns some results, we do not compile right away
-				// we wait one of subsequent poll(burstChangeWait) to return null (no new burst changes happened)
-				for(Path path: todo){
-					compileSass(path);
-				}
-				todo.clear();
-			}else{
-				for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {
 
-					if(changed.getMatcher() == includeFiles){
-						// if any file in include folder changes, we want to recompile all source scss files
-						todo.addAll(sourceFiles.getMatched());						
-					}else{
-						// a source file changed, add only it for recompilation
-						todo.add(changed.getPath());						
-					}
+			changedFiles = folderWatcher.takeBatch(burstChangeWait);
+			if(changedFiles == null) break; // interrupted
+			
+			for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {	
+				if(changed.getMatcher() == includeFiles){
+					// if any file in include folder changes, we want to recompile all source scss files
+					todo.addAll(sourceFiles.getMatched());						
+				}else{
+					// a source file changed, add only it for recompilation
+					todo.add(changed.getPath());						
 				}
 			}
 			
-			pollWait = changedFiles == null ?
-					// if no files changed wait: threadInterruptCheckInterval to allow the thread to be interrupted
-					threadInterruptCheckInterval : 
-					// if some files just changed, wait: burstChangeWait to allow for burst changes to be handled in batch 
-					burstChangeWait;
-					
-			changedFiles = folderWatcher.poll(pollWait,	TimeUnit.MILLISECONDS);
+			for(Path path: todo){
+				compileSass(path);
+			}
 		}
 	}
 

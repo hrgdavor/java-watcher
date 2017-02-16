@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 
 /** 
  * {@link FileMatcher} implementation that uses glob syntax by default. 
- * The rule can be a regex if prefixed with {@code regex:} (see: {@link #makeRule(String)}).
- * 
+ * The rule can be a regex if prefixed with {@code regex:} (see: {@link #makeRule(String)}).<br>
+ * The {@link #collectMatched}
  * 
  *  @see {@link <a href="https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob">What is a glob</a>}
  *  */
@@ -36,8 +36,11 @@ public class FileMatchGlob implements FileMatcher{
 	protected volatile boolean started = false;
 	protected Path rootPath;
 
-	protected boolean collectMatched = false;
-	protected Set<Path> matched = new TreeSet<>(); 
+	/** Default: TRUE. If this matcher will collect matched Files.  */
+	protected boolean collectMatched = true;
+	protected Set<Path> matched = new TreeSet<>();
+
+	/** Default: FALSE. If this matcher will collect unmatched Files.  */
 	protected boolean collectExcluded = false;
 	protected Set<Path> excluded = new TreeSet<>(); 
 
@@ -161,7 +164,7 @@ public class FileMatchGlob implements FileMatcher{
 	
 	/** {@inheritDoc} */
 	@Override
-	public boolean matches(Path path){
+	public boolean isMatch(Path path){
 		if(includes.size() >0){
 			boolean included = false;
 			for (PathMatcher inc : includes) {
@@ -180,7 +183,7 @@ public class FileMatchGlob implements FileMatcher{
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean excluded(Path path){
+	public boolean isExcluded(Path path){
 		for (PathMatcher ex : excludes) {
 			if(ex.matches(path)) return true;
 		}
@@ -216,7 +219,7 @@ public class FileMatchGlob implements FileMatcher{
 	/** {@inheritDoc} */
 	@Override
 	public boolean offer(Path file) {
-        if (matches(file)) {
+        if (isMatch(file)) {
             if(collectMatched) matched.add(file);
             return true;
         } else{

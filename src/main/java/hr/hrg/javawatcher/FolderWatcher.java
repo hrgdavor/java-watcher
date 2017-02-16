@@ -1,6 +1,6 @@
 package hr.hrg.javawatcher;
 
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -41,7 +41,7 @@ public class FolderWatcher<F extends FileMatcher> {
     /** {@link FileMatcher}s we are tracking */
     protected List<F> matchers = new ArrayList<>();
 
-    private WatchService watcher;
+    private WatchService watchService;
 
     /**
      * Add a {@link FileMatcher} that will be used to watch files/folders
@@ -59,11 +59,40 @@ public class FolderWatcher<F extends FileMatcher> {
      * */
 	public Collection<FileChangeEntry<F>> poll() {
 		
-		WatchKey key = watcher.poll();
+		WatchKey key = watchService.poll();
 		
 		return key == null ? null:getFiles(key);
 	}
 	
+    /**
+     *  Takes changed files and returns when something is changed, but waits until no files change for some time (burstDelay parameter).<br> 
+     *  Returns null if interrupted, even if some files were changed when interrupt happened.
+     *  
+     * @param   burstDelay
+     *          (ms) how long to wait for more changes to pickup burst changes in a single batch
+     *
+     * @return  changed files, or {@code null} when interrupted
+     *  */
+	public Collection<FileChangeEntry<F>> takeBatch(long burstDelay) {
+		try {
+			
+			Collection<FileChangeEntry<F>> batch = take();
+
+			Collection<FileChangeEntry<F>> changed = null;
+			while(!Thread.interrupted()){
+				changed = poll(burstDelay, TimeUnit.MILLISECONDS);
+
+				if(changed == null) return batch;
+
+				batch.addAll(changed);
+			}
+		} catch (InterruptedException e) {
+			// ignore the exception, and return null, thus notifying the caller that interrupt happened
+		}
+
+		return null;
+	}
+
     /**
      *  Takes changed files waiting the desired time first, and returns {@code null} if none are changed yet.
      *  
@@ -74,32 +103,41 @@ public class FolderWatcher<F extends FileMatcher> {
      *          parameter
      *
      * @return  changed files, or {@code null}
+     * @throws InterruptedException because null means no results yet, and can not be used to differentiate when the Thread was interrupted
      *  */
-	public Collection<FileChangeEntry<F>> poll(long timeout, TimeUnit unit) {
-		try {
-			
-			WatchKey key = watcher.poll(timeout, unit);
+	public Collection<FileChangeEntry<F>> poll(long timeout, TimeUnit unit) throws InterruptedException {
 		
-			return key == null ? null:getFiles(key);
+		WatchKey key = watchService.poll(timeout, unit);
+	
+		return key == null ? null:getFiles(key);
 
-		} catch (InterruptedException e) {
-			throw new RuntimeException("File watch interrupted.", e);
-		}
+	}
+	
+	
+	/** 
+	 * Takes changed files, but waits until available. If you want to get null when take is interrupted instead of catching InterruptedException use {@link #takeBatch(long)}. 
+	 * 
+     * @return  changed files
+     * @throws InterruptedException when the Thread is interrupted
+	 * */
+	public Collection<FileChangeEntry<F>> take() throws InterruptedException {
+		return getFiles(watchService.take());
 	}
 
 	/** 
-	 * Takes changed files, but waits until available. 
+	 * Takes changed files, but waits until available. Returns null if interrupted. It is less verbose than catching InterruptedException.
 	 * 
-     * @return  changed files
+     * @return  changed files or null if interrupted
+	 * @throws InterruptedException 
 	 * */
-	public Collection<FileChangeEntry<F>> take() {
+	public Collection<FileChangeEntry<F>> takeOrNull(){
 		try {
-			return getFiles(watcher.take());
+			return getFiles(watchService.take());
 		} catch (InterruptedException e) {
-			throw new RuntimeException("File watch interrupted.", e);
+			return null;
 		}
 	}
-
+	
 	/**
 	 * List of tracked {@link FileMatcher}s
 	 * */
@@ -113,7 +151,7 @@ public class FolderWatcher<F extends FileMatcher> {
      * @param input - is this folder for input files
      */
     protected void register(Path dir, F matcher) throws IOException {
-        WatchKey key = dir.register(watcher, ENTRY_MODIFY);
+        WatchKey key = dir.register(watchService, ENTRY_MODIFY);
         WatchEntry<F> prev = keys.get(key);
         log.debug("watch {} for {}", dir, matcher);
         if (prev == null) {
@@ -133,23 +171,20 @@ public class FolderWatcher<F extends FileMatcher> {
      * 
      * @param registerForWatch also register with watch service
      * 
-     * @return files found and accepted by all {@link FileMatcher}s (every FileChangeEntry in this phase will be of type:{@link FileChangeType#CREATE})
      * */
-	public Collection<FileChangeEntry<F>> init(final boolean registerForWatch){
+	public void init(final boolean registerForWatch){
 
-		if(registerForWatch) try {
-			this.watcher = FileSystems.getDefault().newWatchService();
+		if(registerForWatch && watchService == null) try {
+			this.watchService = FileSystems.getDefault().newWatchService();
 		} catch (IOException e){
 			// this is not a recoverable error, so it is intentionally not a declared exception
 			throw new RuntimeException(e.getMessage(), e);
 		}
 
-		Collection<FileChangeEntry<F>> found = new ArrayList<>();
 		for(F matcher:matchers){
-			initMatcher(matcher, registerForWatch, found);
+			initMatcher(matcher, registerForWatch);
 		}
 
-		return found;
 	}
 	
 	/**
@@ -160,32 +195,30 @@ public class FolderWatcher<F extends FileMatcher> {
 	 *  @param registerForWatch register with WatchService during walkFileTree
 	 *  @param found collection to fill with files found and accepted by the {@link FileMatcher}
 	 * */
-	protected void initMatcher(final F matcher, final boolean registerForWatch, final Collection<FileChangeEntry<F>> found) {
+	protected void initMatcher(final F matcher, final boolean registerForWatch) {
 	    try {
 	    	register(matcher.getRootPath(), matcher);
 
 	    	Files.walkFileTree(matcher.getRootPath(), new SimpleFileVisitor<Path>() {
-			    @Override
+			    
+	    		@Override
 			    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
 			    	// we see the file for the first time, so it seems legitimate to use CREATE here
-			    	if(matcher.offer(file))
-			    		found.add(new FileChangeEntry<F>(file, FileChangeType.CREATE, matcher));
-			    	
+			    	matcher.offer(file);
 			        return FileVisitResult.CONTINUE;
 			    }
 
 			    @Override
 			    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-			    	return (matcher.isRecursive() && !matcher.excluded(dir)) || dir.equals(matcher.getRootPath()) ? 
+			    	return (matcher.isRecursive() && !matcher.isExcluded(dir)) || dir.equals(matcher.getRootPath()) ? 
 			    			super.preVisitDirectory(dir, attrs) : FileVisitResult.SKIP_SUBTREE;
 			    }
 			    
 			    @Override
 			    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
 			    	
-			    	
-			    	if(registerForWatch && !matcher.excluded(dir)) register(dir, matcher);
+			    	if(registerForWatch && !matcher.isExcluded(dir)) register(dir, matcher);
 			    	
 			    	return super.postVisitDirectory(dir, exc);
 			    }
@@ -221,7 +254,7 @@ public class FolderWatcher<F extends FileMatcher> {
 				
 				@Override
 				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-					return (recursive && !matcher.excluded(dir)) || dir.equals(rootPath) ? 
+					return (recursive && !matcher.isExcluded(dir)) || dir.equals(rootPath) ? 
 							super.preVisitDirectory(dir, attrs): FileVisitResult.SKIP_SUBTREE;
 				}
 

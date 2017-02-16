@@ -33,8 +33,10 @@ public class SimpleCompileExample {
 		// no configuration should happen after the init or it will give unexpected results
 
 		while(!Thread.interrupted()){
-			Collection<FileChangeEntry<FileMatchGlob>> changedFiles = folderWatcher.take();
 			
+			Collection<FileChangeEntry<FileMatchGlob>> changedFiles = folderWatcher.takeOrNull();
+			if(changedFiles == null) break; // interrupted
+				
 			for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {
 				compileSass(changed.getPath());
 			}

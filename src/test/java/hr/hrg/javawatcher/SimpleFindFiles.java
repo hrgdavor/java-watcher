@@ -22,9 +22,6 @@ public class SimpleFindFiles {
 		// match any .scss file in root folder, and any .scss in subfolders
 		matcher.includes("*.scss","**/*.scss").excludes(".sass-cache");
 
-		// by default matcher does not store matched or excluded files 
-		matcher.setCollectMatched(true);
-
 		FolderWatcher.fillMatcher(matcher);
 		
 		for(Path path :matcher.getMatched()){

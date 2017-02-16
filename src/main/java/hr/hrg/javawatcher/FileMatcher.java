@@ -16,7 +16,7 @@ public interface FileMatcher {
 	 * 
 	 * @return true if matched by defined rules
 	 * */
-	public boolean matches(Path path);
+	public boolean isMatch(Path path);
 
 	/** Check if the provided path is excluded
 	 * 
@@ -24,11 +24,11 @@ public interface FileMatcher {
 	 * 
 	 * @return true if matched by defined exclude rules 
 	 * */
-	public boolean excluded(Path path);
+	public boolean isExcluded(Path path);
 
 	/** Check if the provided path is a match and store in internal include/exclude lists.
 	 * 
-	 * Implementations that do not want to store matched/excluded paths can just return result from {@link #matches(Path)}
+	 * Implementations that do not want to store matched/excluded paths can just return result from {@link #isMatch(Path)}
 	 * 
 	 * @param path 
 	 * 
