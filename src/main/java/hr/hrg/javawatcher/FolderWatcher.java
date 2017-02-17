@@ -15,8 +15,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -143,6 +145,36 @@ public class FolderWatcher<F extends FileMatcher> {
 	 * */
 	public List<F> getMatchers(){
 		return matchers;
+	}
+	
+	/** Get all files matched until now, including information on the matcher that matched the file. */
+	public Collection<FileChangeEntry<F>> getMatched(){
+		Collection<FileChangeEntry<F>> matched = new ArrayList<>();
+		for(F m:matchers){
+			for(Path p: m.getMatched()){
+				matched.add(new FileChangeEntry<F>(p, FileChangeType.MODIFY, m));
+			}
+		}
+		return matched;
+	}
+
+	/** Get all files matched until now, including duplicates if mutliple matchers matched a file. Use {@link #getMatchedFilesUnique()} if you need only unique files.*/
+	public Collection<Path> getMatchedFiles(){
+		Collection<Path> matched = new ArrayList<>();
+		for(F m:matchers){
+			matched.addAll(m.getMatched());
+		}
+		return matched;
+	}
+
+	
+	/** Get all unique files matched until now. */
+	public Set<Path> getMatchedFilesUnique(){
+		Set<Path> matched = new HashSet<>();
+		for(F m:matchers){
+			matched.addAll(m.getMatched());
+		}
+		return matched;
 	}
 	
     /**

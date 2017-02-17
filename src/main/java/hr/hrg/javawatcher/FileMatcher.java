@@ -1,6 +1,7 @@
 package hr.hrg.javawatcher;
 
 import java.nio.file.Path;
+import java.util.Collection;
 
 public interface FileMatcher {
 
@@ -49,5 +50,18 @@ public interface FileMatcher {
 	 * Implementations that do not want to store matched/excluded paths can just leave method empty
 	 * */
 	public void fileDeleted(Path path);
+
+	/**
+	 * Get the current collection of files offered and accepted based on the rules.
+	 * You must {@link #setCollectMatched(boolean)} during initialisation, or the list will be empty.
+	 * */
+	public Collection<Path> getMatched();
+
+	/**
+	 * Are matched files for later listing. Use when you want to know what were collected.
+	 * */
+	public void setCollectMatched(boolean collectMatched);
+
+	public Path relativize(Path path);
 	
 }

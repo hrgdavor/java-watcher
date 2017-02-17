@@ -27,28 +27,19 @@ public class SimpleExternalScriptExample {
 		String pathToWatch = args[0];
 		String commandToRun = args[1];
 		
-		// FolderWatcher is the utility that uses the WatchService but needs at least one FileMatcher
-		FolderWatcher<FileMatchGlob> folderWatcher = new FolderWatcher<>();
+		// GlobWatcher is for simple usages
+		GlobWatcher watcher = new GlobWatcher(Paths.get(pathToWatch), true);
 
-		// in our case FileMatchGlob instance is used, and uses glob syntax
-		// this one is configured for current folder without checking sub-folders (second param is false)
-		FileMatchGlob matcher = folderWatcher.add(new FileMatchGlob(Paths.get(pathToWatch), true));
-		
 		// init with intention to watch the files after that
-		folderWatcher.init(true);
-		// no configuration should happen after the init, or it will give unexpected results		
+		watcher.init(true);
 
 		long burstChangeWait = 50;
-		HashSet<Path> todo = new HashSet<>();
-
-		Collection<FileChangeEntry<FileMatchGlob>> changedFiles = null;
 
 		while(!Thread.interrupted()){
 
-			changedFiles = folderWatcher.takeBatch(burstChangeWait);
-			if(changedFiles == null) break; // interrupted
-			
-			System.out.println(sdf.format(new Date())+" - "+todo.size()+" files changed");
+			if(watcher.takeBatch(burstChangeWait) == null) break; // interrupted
+
+			System.out.println(sdf.format(new Date())+" - files changed");
 			runScript(commandToRun);
 
 		}

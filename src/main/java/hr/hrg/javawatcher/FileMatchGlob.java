@@ -109,11 +109,19 @@ public class FileMatchGlob implements FileMatcher{
 	public List<PathMatcher> getIncludes() {
 		return includes;
 	}
+	
+	/** 
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Path relativize(Path path){
+		return rootPath.relativize(path);
+	}
 
-	/**
-	 * Get the current collection of files offered and accepted based on the rules.
-	 * You must {@link #setCollectMatched(boolean)} during initialisation, or the list will be empty.
-	 * */
+	/** 
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Collection<Path> getMatched(){
 		if(!collectMatched) throw new RuntimeException(NOT_COLLECTING_MATCHES+toString());
 		return matched;
@@ -126,7 +134,7 @@ public class FileMatchGlob implements FileMatcher{
 
 	/**
 	 * Get the current collection of files offered but excluded based on the rules.
-	 * You must {@link #setCollectMatched(boolean)} during initialisation, or the list will be empty.
+	 * You must {@link #setCollectExcluded(boolean)} during initialisation, or the list will be empty.
 	 * */
 	public Collection<Path> getExcluded(){
 		if(!collectExcluded) throw new RuntimeException(NOT_COLLECTING_EXCLUDED+toString());
@@ -153,9 +161,10 @@ public class FileMatchGlob implements FileMatcher{
 		this.collectExcluded = collectExcluded;
 	}
 	
-	/**
-	 * Are matched files for later listing. Use when you want to know what were collected.
-	 * */
+	/** 
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setCollectMatched(boolean collectMatched) {
 		this.collectMatched = collectMatched;
 	}
