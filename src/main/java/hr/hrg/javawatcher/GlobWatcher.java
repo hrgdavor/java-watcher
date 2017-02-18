@@ -2,6 +2,7 @@ package hr.hrg.javawatcher;
 
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -30,24 +31,53 @@ public class GlobWatcher {
 		this(root,true);
 	}
 
-	public Collection<FileChangeEntry<FileMatchGlob>> poll() {
+	public static final Collection<Path> toPaths(Collection<FileChangeEntry<FileMatchGlob>> poll) {
+		if(poll == null) return null;
+		Collection<Path> paths = new ArrayList<Path>(poll.size());
+		
+		for(FileChangeEntry<FileMatchGlob> p:poll) paths.add(p.getPath());
+		
+		return paths;
+	}
+	
+	public Collection<FileChangeEntry<FileMatchGlob>> poll(){
 		return watcher.poll();
+	}
+
+	public Collection<Path> pollFiles(){
+		return toPaths(watcher.poll());
 	}
 
 	public Collection<FileChangeEntry<FileMatchGlob>> takeBatch(long burstDelay) {
 		return watcher.takeBatch(burstDelay);
 	}
+	
+	public Collection<Path> takeBatchFiles(long burstDelay) {
+		return toPaths(watcher.takeBatch(burstDelay));
+	}
 
 	public Collection<FileChangeEntry<FileMatchGlob>> poll(long timeout, TimeUnit unit) throws InterruptedException {
 		return watcher.poll(timeout, unit);
+	}
+	
+	public Collection<Path> pollFiles(long timeout, TimeUnit unit) throws InterruptedException {
+		return toPaths(watcher.poll(timeout, unit));
 	}
 
 	public Collection<FileChangeEntry<FileMatchGlob>> take() throws InterruptedException {
 		return watcher.take();
 	}
+	
+	public Collection<Path> takeFiles() throws InterruptedException {
+		return toPaths(watcher.take());
+	}
 
 	public Collection<FileChangeEntry<FileMatchGlob>> takeOrNull() {
 		return watcher.takeOrNull();
+	}
+	
+	public Collection<Path> takeOrNullFiles() {
+		return toPaths(watcher.takeOrNull());
 	}
 
 	public Collection<FileChangeEntry<FileMatchGlob>> getMatched() {
