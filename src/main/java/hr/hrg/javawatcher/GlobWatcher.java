@@ -31,11 +31,11 @@ public class GlobWatcher {
 		this(root,true);
 	}
 
-	public static final Collection<Path> toPaths(Collection<FileChangeEntry<FileMatchGlob>> poll) {
-		if(poll == null) return null;
-		Collection<Path> paths = new ArrayList<Path>(poll.size());
+	public static final Collection<Path> toPaths(Collection<FileChangeEntry<FileMatchGlob>> changes) {
+		if(changes == null) return null;
+		Collection<Path> paths = new ArrayList<Path>(changes.size());
 		
-		for(FileChangeEntry<FileMatchGlob> p:poll) paths.add(p.getPath());
+		for(FileChangeEntry<FileMatchGlob> p:changes) paths.add(p.getPath());
 		
 		return paths;
 	}

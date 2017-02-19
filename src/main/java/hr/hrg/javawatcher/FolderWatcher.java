@@ -63,7 +63,7 @@ public class FolderWatcher<F extends FileMatcher> {
 		
 		WatchKey key = watchService.poll();
 		
-		return key == null ? null:getFiles(key);
+		return key == null ? null:getFilesOrNull(key);
 	}
 	
     /**
@@ -84,9 +84,9 @@ public class FolderWatcher<F extends FileMatcher> {
 			while(!Thread.interrupted()){
 				changed = poll(burstDelay, TimeUnit.MILLISECONDS);
 
-				if(changed == null) return batch;
+				if(changed == null && batch.size() >0) return batch;
 
-				batch.addAll(changed);
+				if(changed != null) batch.addAll(changed);
 			}
 		} catch (InterruptedException e) {
 			// ignore the exception, and return null, thus notifying the caller that interrupt happened
@@ -111,7 +111,7 @@ public class FolderWatcher<F extends FileMatcher> {
 		
 		WatchKey key = watchService.poll(timeout, unit);
 	
-		return key == null ? null:getFiles(key);
+		return key == null ? null:getFilesOrNull(key);
 
 	}
 	
@@ -123,7 +123,12 @@ public class FolderWatcher<F extends FileMatcher> {
      * @throws InterruptedException when the Thread is interrupted
 	 * */
 	public Collection<FileChangeEntry<F>> take() throws InterruptedException {
-		return getFiles(watchService.take());
+		while(!Thread.interrupted()) {
+			Collection<FileChangeEntry<F>> files = getFiles(watchService.take());
+			if(files.size() > 0) return files;
+			// something changed, but none for our matchers
+		}
+		throw new InterruptedException("take interrupted");
 	}
 
 	/** 
@@ -134,7 +139,7 @@ public class FolderWatcher<F extends FileMatcher> {
 	 * */
 	public Collection<FileChangeEntry<F>> takeOrNull(){
 		try {
-			return getFiles(watchService.take());
+			return take();
 		} catch (InterruptedException e) {
 			return null;
 		}
@@ -229,7 +234,7 @@ public class FolderWatcher<F extends FileMatcher> {
 	 * */
 	protected void initMatcher(final F matcher, final boolean registerForWatch) {
 	    try {
-	    	register(matcher.getRootPath(), matcher);
+	    	if(registerForWatch) register(matcher.getRootPath(), matcher);
 
 	    	Files.walkFileTree(matcher.getRootPath(), new SimpleFileVisitor<Path>() {
 			    
@@ -301,6 +306,12 @@ public class FolderWatcher<F extends FileMatcher> {
 		}			
 	}
 
+	protected Collection<FileChangeEntry<F>> getFilesOrNull(WatchKey key) {
+		Collection<FileChangeEntry<F>> files = getFiles(key);
+		if(files.size() == 0) return null;
+		return files;
+	}
+	
 	/**
 	 * Collect all files from the WatchKey.
 	 * 
