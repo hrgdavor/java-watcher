@@ -72,4 +72,9 @@ public class FileChangeEntry<T extends FileMatcher> {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return file.toAbsolutePath()+" "+type;
+	}
 }
