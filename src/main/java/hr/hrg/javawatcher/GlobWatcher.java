@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +41,15 @@ public class GlobWatcher {
 		return paths;
 	}
 	
+	public static final Collection<Path> toPathsUnique(Collection<FileChangeEntry<FileMatchGlob>> changes) {
+		if(changes == null) return null;
+		Collection<Path> paths = new HashSet<Path>(changes.size());
+		
+		for(FileChangeEntry<FileMatchGlob> p:changes) paths.add(p.getPath());
+		
+		return paths;
+	}
+	
 	public Collection<FileChangeEntry<FileMatchGlob>> poll(){
 		return watcher.poll();
 	}
@@ -54,6 +64,10 @@ public class GlobWatcher {
 	
 	public Collection<Path> takeBatchFiles(long burstDelay) {
 		return toPaths(watcher.takeBatch(burstDelay));
+	}
+
+	public Collection<Path> takeBatchFilesUnique(long burstDelay) {
+		return toPathsUnique(watcher.takeBatch(burstDelay));
 	}
 
 	public Collection<FileChangeEntry<FileMatchGlob>> poll(long timeout, TimeUnit unit) throws InterruptedException {
