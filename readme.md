@@ -45,6 +45,8 @@ Add maven dependency or download from [maven central](http://repo1.maven.org/mav
 </dependency>
 ```
 
+## Simple Compile Example
+
 [SimpleCompileExample.java](src/test/java/hr/hrg/javawatcher/SimpleCompileExample.java)
 is an example showing how to compile sass file on change 
 
@@ -74,6 +76,8 @@ while(!Thread.interrupted()){
 
 ```
 
+## Simple Find Files
+
 [SimpleFindFiles.java](src/test/java/hr/hrg/javawatcher/SimpleFindFiles.java)
 is an e xample showing how to find files using {@link FileMatchGlob} by adding few include/exclude rules.
 
@@ -93,6 +97,8 @@ for(Path path :matcher.getMatched()){
 }
 
 ```
+
+## Complex Compile example
 
 [ComplexCompileExample.java](src/test/java/hr/hrg/javawatcher/ComplexCompileExample.java)
 is a more complex example showing :
