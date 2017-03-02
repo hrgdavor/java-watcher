@@ -281,6 +281,7 @@ public class FolderWatcher<F extends FileMatcher> {
 			
 			final boolean recursive = matcher.isRecursive();
 			final Path rootPath = matcher.getRootPath();
+			matcher.setCollectMatched(true);
 	
 			Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
 				@Override
