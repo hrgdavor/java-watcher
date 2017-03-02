@@ -4,6 +4,8 @@ file matching and file watching that feels more natural to me.
 
 You could find it useful as a library, or just read source for examples of using Java 7 WatchService. 
 
+Latest release is [0.2.0](releases/tag/v0.1.0) but you can build the current SNAPSHOT with maven and use that.
+
 # Command line Usage
 
 [Main.java](src/main/java/hr/hrg/javawatcher/Main.java) is a general purpose tool for direct command line usage.
@@ -12,7 +14,7 @@ To use it build project with maven and use the shaded jar from target folder.
 Without parameter it will display help information 
 
 ```
-> java -jar java-watcher-0.2.0-SNAPSHOT-shaded.jar 
+> java -jar java-watcher-0.2.0-shaded.jar 
 
 Usage: folder script [arguments]
  --burstDelay=x    - number of miliseconds to wait before sending changes 
@@ -30,7 +32,7 @@ Usage: folder script [arguments]
 Example usage [example.bat](example/example.bat) and example script in php to catch the changes [example.php](example/example.php)
 
 ```
-java -jar java-watcher-0.2.0-SNAPSHOT-shaded.jar testFolder http://localhost/test/example.php --burstDelay=50 --include=**.txt --exclude=**.html --exclude=**.doc
+java -jar java-watcher-0.2.0-shaded.jar testFolder http://localhost/test/example.php --burstDelay=50 --include=**.txt --exclude=**.html --exclude=**.doc
 ```
 
 # Use in java code
