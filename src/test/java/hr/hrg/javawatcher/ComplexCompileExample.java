@@ -25,7 +25,7 @@ public class ComplexCompileExample {
 	public static void main(String[] args) {
 
 		// tweak this depending how responsive you want to be, but to still catch some duplicate changes
-		long burstChangeWait = 20;
+		long burstDelay = 20;
 
 		// for collecting files to compile, and to skip duplicates
 		HashSet<Path> todo = new HashSet<>();
@@ -50,7 +50,7 @@ public class ComplexCompileExample {
 		
 		while(!Thread.interrupted()){
 
-			changedFiles = watcher.takeBatch(burstChangeWait);
+			changedFiles = watcher.takeBatch(burstDelay);
 			if(changedFiles == null) break; // interrupted
 			
 			for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {	
