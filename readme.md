@@ -9,7 +9,9 @@ Latest release is [0.2.0](releases/tag/v0.2.0) but you can build the current SNA
 # Command line Usage
 
 [Main.java](src/main/java/hr/hrg/javawatcher/Main.java) is a general purpose tool for direct command line usage.
-To use it build project with maven and use the shaded jar from target folder.
+To use it, just download latest jar from [maven central](http://repo1.maven.org/maven2/hr/hrg/java-watcher/) 
+or [sonatype oss](https://oss.sonatype.org/content/repositories/releases/hr/hrg/java-watcher/) 
+or build the project with maven and use the shaded jar from target folder.
 
 Without parameter it will display help information 
 
@@ -38,6 +40,7 @@ java -jar java-watcher-0.2.0-shaded.jar testFolder http://localhost/test/example
 # Use in java code
 
 Add maven dependency or download from [maven central](http://repo1.maven.org/maven2/hr/hrg/java-watcher/)
+or download from [sonatype oss](https://oss.sonatype.org/content/repositories/releases/hr/hrg/java-watcher/)
 
 ```
 <dependency>
