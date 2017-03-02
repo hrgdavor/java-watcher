@@ -4,7 +4,7 @@ file matching and file watching that feels more natural to me.
 
 You could find it useful as a library, or just read source for examples of using Java 7 WatchService. 
 
-#Usage
+# Command line Usage
 
 Add maven dependency or download from [maven central](http://repo1.maven.org/maven2/hr/hrg/java-watcher/)
 
@@ -15,6 +15,36 @@ Add maven dependency or download from [maven central](http://repo1.maven.org/mav
 	<version>0.1.0</version>
 </dependency>
 ```
+
+
+[Main.java](src/main/java/hr/hrg/javawatcher/Main.java) is a general purpose tool for direct command line usage.
+To use it build project with maven and use the shaded jar from target folder.
+
+Without parameter it will display help information 
+
+```
+> java -jar java-watcher-0.2.0-SNAPSHOT-shaded.jar 
+
+Usage: folder script [arguments]
+ --burstDelay=x    - number of miliseconds to wait before sending changes 
+                     (some programs may generate more than one chenge event in very short time when writing a file) 
+ --include=pattern - can be used multiple times, defines an include pattern
+ --include=pattern - can be used multiple times, defines an include pattern
+ --exclude=pattern - can be used multiple times, defines an include pattern
+ Example patterns
+ *.txt - all files ending with .txt in root folder
+ **.txt - all files ending with .txt in all folders
+ nice/*.txt - all files ending with .txt in fodler "nice"
+ nice/**.txt - all files ending with .txt in all subfolders of "nice"
+ nice/first.txt - exactly that file
+```
+Example usage [example.bat](example/example.bat) and example script in php to catch the changes [example.php](example/example.php)
+
+```
+java -jar java-watcher-0.2.0-SNAPSHOT-shaded.jar testFolder http://localhost/test/example.php --burstDelay=50 --include=**.txt --exclude=**.html --exclude=**.doc
+```
+
+# Use in java code
 
 [SimpleCompileExample.java](src/test/java/hr/hrg/javawatcher/SimpleCompileExample.java)
 is an example showing how to compile sass file on change 
