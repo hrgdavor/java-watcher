@@ -24,6 +24,10 @@ public class SimpleCompileExample {
 		watcher.init(true);
 		// no configuration should happen after the init or it will give unexpected results
 
+		// after init you can request all files that were found and for example recompile
+		// everything before going to watch mode
+		// Collection<Path> matchedFiles = watcher.getMatchedFiles();
+		
 		while(!Thread.interrupted()){
 			
 			Collection<FileChangeEntry<FileMatchGlob>> changedFiles = watcher.takeOrNull();
