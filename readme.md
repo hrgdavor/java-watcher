@@ -50,6 +50,23 @@ or download from [sonatype oss](https://oss.sonatype.org/content/repositories/re
 </dependency>
 ```
 
+The library uses ```org.slf4j:slf4j-simple``` for simple logging and you will likely will want to exclude it and use logback or log4j in your project.
+
+```
+<dependency>
+	<groupId>hr.hrg</groupId>
+	<artifactId>java-watcher</artifactId>
+	<version>0.2.0</version>
+	<exclusions>
+		<exclusion>
+			<artifactId>org.slf4j</artifactId>
+			<groupId>slf4j-simple</groupId>
+		</exclusion>
+	</exclusions>
+</dependency>
+```
+
+
 ## Simple Compile Example
 
 [SimpleCompileExample.java](src/test/java/hr/hrg/javawatcher/SimpleCompileExample.java)
