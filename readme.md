@@ -6,17 +6,6 @@ You could find it useful as a library, or just read source for examples of using
 
 # Command line Usage
 
-Add maven dependency or download from [maven central](http://repo1.maven.org/maven2/hr/hrg/java-watcher/)
-
-```
-<dependency>
-	<groupId>hr.hrg</groupId>
-	<artifactId>java-watcher</artifactId>
-	<version>0.1.0</version>
-</dependency>
-```
-
-
 [Main.java](src/main/java/hr/hrg/javawatcher/Main.java) is a general purpose tool for direct command line usage.
 To use it build project with maven and use the shaded jar from target folder.
 
@@ -45,6 +34,16 @@ java -jar java-watcher-0.2.0-SNAPSHOT-shaded.jar testFolder http://localhost/tes
 ```
 
 # Use in java code
+
+Add maven dependency or download from [maven central](http://repo1.maven.org/maven2/hr/hrg/java-watcher/)
+
+```
+<dependency>
+	<groupId>hr.hrg</groupId>
+	<artifactId>java-watcher</artifactId>
+	<version>0.1.0</version>
+</dependency>
+```
 
 [SimpleCompileExample.java](src/test/java/hr/hrg/javawatcher/SimpleCompileExample.java)
 is an example showing how to compile sass file on change 
