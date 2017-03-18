@@ -135,7 +135,6 @@ public class FolderWatcher<F extends FileMatcher> {
 	 * Takes changed files, but waits until available. Returns null if interrupted. It is less verbose than catching InterruptedException.
 	 * 
      * @return  changed files or null if interrupted
-	 * @throws InterruptedException 
 	 * */
 	public Collection<FileChangeEntry<F>> takeOrNull(){
 		try {
@@ -185,7 +184,7 @@ public class FolderWatcher<F extends FileMatcher> {
     /**
      * Register the given directory with the WatchService.
      * @param dir
-     * @param input - is this folder for input files
+     * @param matcher
      */
     protected void register(Path dir, F matcher) throws IOException {
         WatchKey key = dir.register(watchService, ENTRY_MODIFY);
@@ -230,7 +229,6 @@ public class FolderWatcher<F extends FileMatcher> {
 	 * 
 	 *  @param matcher the {@link FileMatcher} to initialise
 	 *  @param registerForWatch register with WatchService during walkFileTree
-	 *  @param found collection to fill with files found and accepted by the {@link FileMatcher}
 	 * */
 	protected void initMatcher(final F matcher, final boolean registerForWatch) {
 	    try {

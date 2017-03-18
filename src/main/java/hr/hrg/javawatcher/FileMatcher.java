@@ -35,7 +35,7 @@ public interface FileMatcher {
 	 * 
 	 * @return true if matched by defined include rules
 	 * */
-	public boolean offer(Path file);
+	public boolean offer(Path path);
 
 	/**
 	 * Method that will be called when a previously existing folder is deleted, allowing maintenance of live files list.

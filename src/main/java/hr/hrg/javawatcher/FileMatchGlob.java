@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * The rule can be a regex if prefixed with {@code regex:} (see: {@link #makeRule(String)}).<br>
  * The {@link #collectMatched}
  * 
- *  @see {@link <a href="https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob">What is a glob</a>}
+ *  @see <a href="https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob">What is a glob</a>
  *  */
 public class FileMatchGlob implements FileMatcher{
 
