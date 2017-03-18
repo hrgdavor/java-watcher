@@ -4,7 +4,7 @@ file matching and file watching that feels more natural to me.
 
 You could find it useful as a library, or just read source for examples of using Java 7 WatchService. 
 
-Latest release is [0.2.0](releases/tag/v0.2.0) but you can build the current SNAPSHOT with maven and use that.
+Latest release is [0.2.0](/hrgdavor/java-watcher/releases/tag/v0.2.0) but you can build the current SNAPSHOT with maven and use that.
 
 # Command line Usage
 
