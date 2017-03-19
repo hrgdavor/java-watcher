@@ -211,7 +211,7 @@ public class FolderWatcher<F extends FileMatcher> {
 	public void init(final boolean registerForWatch){
 
 		if(registerForWatch && watchService == null) try {
-			this.watchService = FileSystems.getDefault().newWatchService();
+			watchService = FileSystems.getDefault().newWatchService();
 		} catch (IOException e){
 			// this is not a recoverable error, so it is intentionally not a declared exception
 			throw new RuntimeException(e.getMessage(), e);
@@ -355,4 +355,12 @@ public class FolderWatcher<F extends FileMatcher> {
 		return files;
 	}
 	
+	public void close() {
+		try {
+			
+			watchService.close();
+		} catch (IOException e) {
+			log.error("Error stopping watcher "+e.getMessage(),e);
+		}
+	}
 }

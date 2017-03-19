@@ -173,6 +173,9 @@ public class GlobWatcher {
 	public boolean isRecursive() {
 		return matcher.isRecursive();
 	}
-	
 
+	public void close() {
+		watcher.close();
+	}
+	
 }
