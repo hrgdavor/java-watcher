@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * This class is generic to make it easier to work with your own customised {@link FileMatcher} Implementation.
  * 
  * */
-public class FolderWatcher<F extends FileMatcher> {
+public class FolderWatcher<F extends FileMatcher> implements AutoCloseable {
 
 	Logger log = LoggerFactory.getLogger(FolderWatcher.class);
 	

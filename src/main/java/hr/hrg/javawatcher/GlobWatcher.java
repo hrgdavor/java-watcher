@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /** Combination of single {@link FolderWatcher} and a {@link FileMatchGlob} to simplify simple watch situations*/
-public class GlobWatcher {
+public class GlobWatcher implements AutoCloseable{
 	FolderWatcher<FileMatchGlob> watcher = new FolderWatcher<FileMatchGlob>();
 	FileMatchGlob matcher;
 	
