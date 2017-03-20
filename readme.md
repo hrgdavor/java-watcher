@@ -1,4 +1,4 @@
-Java watcher [![Maven Central](https://img.shields.io/maven-central/v/hr.hrg/java-watcher.svg)](https://mvnrepository.com/artifact/hr.hrg/java-watcher)
+#Java watcher [![Maven Central](https://img.shields.io/maven-central/v/hr.hrg/java-watcher.svg)](https://mvnrepository.com/artifact/hr.hrg/java-watcher)
 
 #Introduction
 Utility for watching file changes using Java 7 WatchService. Written to allow myself working with
