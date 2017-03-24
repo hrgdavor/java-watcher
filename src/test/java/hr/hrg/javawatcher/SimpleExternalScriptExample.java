@@ -27,21 +27,22 @@ public class SimpleExternalScriptExample {
 		String pathToWatch = args[0];
 		String commandToRun = args[1];
 		
-		// GlobWatcher is for simple usages
-		GlobWatcher watcher = new GlobWatcher(Paths.get(pathToWatch), true);
-
-		// init with intention to watch the files after that
-		watcher.init(true);
-
-		long burstChangeWait = 50;
-
-		while(!Thread.interrupted()){
-
-			if(watcher.takeBatch(burstChangeWait) == null) break; // interrupted
-
-			System.out.println(sdf.format(new Date())+" - files changed");
-			runScript(commandToRun);
-
+		// GlobWatcher implements AutoCloseable. Use it in try-with-resources or call .close() manually 
+		try (GlobWatcher watcher = new GlobWatcher(Paths.get(pathToWatch), true)) {
+			
+			// init with intention to watch the files after that
+			watcher.init(true);
+			
+			long burstChangeWait = 50;
+			
+			while(!Thread.interrupted()){
+				
+				if(watcher.takeBatch(burstChangeWait) == null) break; // interrupted
+				
+				System.out.println(sdf.format(new Date())+" - files changed");
+				runScript(commandToRun);
+				
+			}
 		}
 	}
 

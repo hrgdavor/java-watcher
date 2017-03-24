@@ -30,41 +30,44 @@ public class ComplexCompileExample {
 		// for collecting files to compile, and to skip duplicates
 		HashSet<Path> todo = new HashSet<>();
 		
-		GlobWatcher watcher = new GlobWatcher(Paths.get("./scss"), true);
-		// "**.scss" matches in all folders and subfolders
-		watcher.includes("**.scss");
-
-		// create matcher on current folder without checking sub-folders for the source scss
-		FileMatchGlob sourceFiles = new FileMatchGlob(Paths.get("./"), false);
-		// if we do not define rules, then any file found will be accepted
-		// match any .scss file in root folder only
-		sourceFiles.includes("*.scss");
+		// GlobWatcher implements AutoCloseable. Use it in try-with-resources or call .close() manually 
+		try( GlobWatcher watcher = new GlobWatcher(Paths.get("./scss"), true) ){
 		
-		// add the additional matcher to listen for changes too
-		watcher.add(sourceFiles);
-		
-		//start watching, no configuration should happen after this as it wil give unexpected results
-		watcher.init(true);
-		
-		Collection<FileChangeEntry<FileMatchGlob>> changedFiles = null;
-		
-		while(!Thread.interrupted()){
-
-			changedFiles = watcher.takeBatch(burstDelay);
-			if(changedFiles == null) break; // interrupted
+			// "**.scss" matches in all folders and subfolders
+			watcher.includes("**.scss");
+	
+			// create matcher on current folder without checking sub-folders for the source scss
+			FileMatchGlob sourceFiles = new FileMatchGlob(Paths.get("./"), false);
+			// if we do not define rules, then any file found will be accepted
+			// match any .scss file in root folder only
+			sourceFiles.includes("*.scss");
 			
-			for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {	
-				if(changed.getMatcher() == sourceFiles){
-					// a source file changed, add only it for recompilation
-					todo.add(changed.getPath());						
-				}else{
-					// if any file in include folder changes, we want to recompile all source scss files
-					todo.addAll(sourceFiles.getMatched());						
+			// add the additional matcher to listen for changes too
+			watcher.add(sourceFiles);
+			
+			//start watching, no configuration should happen after this as it wil give unexpected results
+			watcher.init(true);
+			
+			Collection<FileChangeEntry<FileMatchGlob>> changedFiles = null;
+			
+			while(!Thread.interrupted()){
+	
+				changedFiles = watcher.takeBatch(burstDelay);
+				if(changedFiles == null) break; // interrupted
+				
+				for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {	
+					if(changed.getMatcher() == sourceFiles){
+						// a source file changed, add only it for recompilation
+						todo.add(changed.getPath());						
+					}else{
+						// if any file in include folder changes, we want to recompile all source scss files
+						todo.addAll(sourceFiles.getMatched());						
+					}
 				}
-			}
-			
-			for(Path path: todo){
-				compileSass(path);
+				
+				for(Path path: todo){
+					compileSass(path);
+				}
 			}
 		}
 	}
