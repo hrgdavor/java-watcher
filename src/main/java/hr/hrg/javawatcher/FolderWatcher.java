@@ -189,7 +189,7 @@ public class FolderWatcher<F extends FileMatcher> implements AutoCloseable {
     protected void register(Path dir, F matcher) throws IOException {
         WatchKey key = dir.register(watchService, ENTRY_MODIFY);
         WatchEntry<F> prev = keys.get(key);
-        log.debug("watch {} for {}", dir, matcher);
+        log.trace("watch {} for {}", dir, matcher);
         if (prev == null) {
         	prev = new WatchEntry<F>(dir);
             keys.put(key, prev);
