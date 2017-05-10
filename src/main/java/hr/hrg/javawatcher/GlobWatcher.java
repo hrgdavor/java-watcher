@@ -23,6 +23,7 @@ public class GlobWatcher implements AutoCloseable{
 	}
 
 	public GlobWatcher(Path root, boolean recursive) {
+		if(root == null) throw new NullPointerException("root must be defined");
 		matcher = new FileMatchGlob(root, recursive);
 		watcher.add(matcher);
 	}
