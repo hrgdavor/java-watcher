@@ -29,7 +29,7 @@ public class Main {
 		
 		String pathToWatch = args[0];
 		String commandToRun = args[1];
-		
+		boolean postChanges = false;
 		Logger log = LoggerFactory.getLogger(Main.class);
 
 		GlobWatcher watcher = new GlobWatcher(Paths.get(pathToWatch));
@@ -46,6 +46,8 @@ public class Main {
 				
 			}else if(args[i].startsWith("--exclude=")) {
 				watcher.excludes(args[i].substring(10));
+			}else if(args[i].equals("--postChanges")) {
+				postChanges = true;
 			}
 		}
 
@@ -58,7 +60,7 @@ public class Main {
 			if(changed == null) break; // interrupted
 
 			System.out.println(sdf.format(new Date())+" - "+changed.size()+" files changed");
-			runScript(log,commandToRun, null, changed, true, System.out, System.err);
+			runScript(log,commandToRun, null, changed, postChanges, System.out, System.err);
 		}
 		
 	}
@@ -134,7 +136,7 @@ public class Main {
 		System.out.println("Usage: folder script [arguments]");
 		System.out.println(" --burstDelay=x    - number of miliseconds to wait before sending changes ");
 		System.out.println("                     (some programs may generate more than one chenge event in very short time when writing a file) ");
-		System.out.println(" --postChanges=x   - write changed files info to the script/url (script input stream or HTTP POST for url) ");
+		System.out.println(" --postChanges     - write changed files info to the script/url (script input stream or HTTP POST for url) ");
 		System.out.println(" --include=pattern - can be used multiple times, defines an include pattern");
 		System.out.println(" --include=pattern - can be used multiple times, defines an include pattern");
 		System.out.println(" --exclude=pattern - can be used multiple times, defines an include pattern");
