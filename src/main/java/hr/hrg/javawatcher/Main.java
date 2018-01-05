@@ -104,7 +104,7 @@ public class Main {
 		
 	}
 
-	public static void runScript(Logger log, String command, String[] params, Collection<Path> changed, boolean postChanges, PrintStream out, PrintStream err) throws Exception{
+	public static void runScript(Logger log, String command, String[] params, Collection<Path> changed, boolean postChanges, PrintStream out, final PrintStream err) throws Exception{
 		if(command.startsWith("http://")){
 				runHttp(log, command, changed, postChanges, out);
 		}else {
@@ -118,13 +118,22 @@ public class Main {
 				}else {
 					cmdArray = new String[]{command};
 				}
-				Process process = Runtime.getRuntime().exec(cmdArray);
+				final Process process = Runtime.getRuntime().exec(cmdArray);
 				if(postChanges) {
 					process.getOutputStream().write(bytesToWrite(changed));
 					process.getOutputStream().close();
 				}
+				new Thread(new Runnable() {
+					public void run() {						
+						try {
+							pipeStream(process.getErrorStream(), err);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
+
 				pipeStream(process.getInputStream(), out);
-				pipeStream(process.getErrorStream(), err);
 				log.info("done running script: "+command);
 			} catch (IOException e) {
 				e.printStackTrace();
