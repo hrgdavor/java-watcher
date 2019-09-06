@@ -2,20 +2,18 @@ package hr.hrg.javawatcher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 public class Main {
 	
@@ -30,7 +28,7 @@ public class Main {
 		String pathToWatch = args[0];
 		String commandToRun = args[1];
 		boolean postChanges = false;
-		Logger log = LoggerFactory.getLogger(Main.class);
+		Logger log = Logger.getLogger(Main.class.getName());
 
 		GlobWatcher watcher = new GlobWatcher(Paths.get(pathToWatch));
 		long burstDelay = 50;

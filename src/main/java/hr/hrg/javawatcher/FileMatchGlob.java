@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /** 
  * {@link FileMatcher} implementation that uses glob syntax by default. 
@@ -26,7 +26,7 @@ public class FileMatchGlob implements FileMatcher{
 
 	private static final String NOT_COLLECTING_MATCHES = "This matcher is not collecting matches. Call setCollectMatched(true) or override this method if you do not want exception thrown. ";
 
-	static final Logger log = LoggerFactory.getLogger(FileMatchGlob.class);
+	//static final Logger log = LoggerFactory.getLogger(FileMatchGlob.class);
 
     protected String rootString;
     protected boolean recursive;

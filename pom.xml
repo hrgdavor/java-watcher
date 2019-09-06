@@ -17,7 +17,7 @@
 
 	<dependencies>
 
-		<dependency>
+		<!-- dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.21</version>
@@ -28,7 +28,7 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.21</version>
 			<optional>true</optional>
-		</dependency>
+		</dependency -->
 
 	</dependencies>
 

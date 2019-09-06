@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for grouping different folder watching tasks and handling changes from a single
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * */
 public class FolderWatcher<F extends FileMatcher> implements AutoCloseable {
 
-	Logger log = LoggerFactory.getLogger(FolderWatcher.class);
+//	Logger log = LoggerFactory.getLogger(FolderWatcher.class);
 	
     protected final Map<WatchKey,WatchEntry<F>> keys = new HashMap<WatchKey,WatchEntry<F>>();
 
@@ -189,7 +189,7 @@ public class FolderWatcher<F extends FileMatcher> implements AutoCloseable {
     protected void register(Path dir, F matcher) throws IOException {
         WatchKey key = dir.register(watchService, ENTRY_MODIFY);
         WatchEntry<F> prev = keys.get(key);
-        log.trace("watch {} for {}", dir, matcher);
+//        log.trace("watch {} for {}", dir, matcher);
         if (prev == null) {
         	prev = new WatchEntry<F>(dir);
             keys.put(key, prev);
@@ -360,7 +360,8 @@ public class FolderWatcher<F extends FileMatcher> implements AutoCloseable {
 			
 			watchService.close();
 		} catch (IOException e) {
-			log.error("Error stopping watcher "+e.getMessage(),e);
+			e.printStackTrace();
+//			log.error("Error stopping watcher "+e.getMessage(),e);
 		}
 	}
 }
