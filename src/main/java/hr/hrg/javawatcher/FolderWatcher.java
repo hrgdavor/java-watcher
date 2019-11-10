@@ -357,8 +357,7 @@ public class FolderWatcher<F extends FileMatcher> implements AutoCloseable {
 	
 	public void close() {
 		try {
-			
-			watchService.close();
+			if(watchService != null) watchService.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 //			log.error("Error stopping watcher "+e.getMessage(),e);
