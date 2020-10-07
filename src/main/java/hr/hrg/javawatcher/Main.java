@@ -17,6 +17,8 @@ import java.util.logging.Logger;
 
 public class Main {
 	
+	public static int VERBOSE = 0;
+
 	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	
 	public static void main(String[] args) throws Exception{
@@ -211,4 +213,25 @@ public class Main {
         return sb.toString();
     }	
 
+	public static void logError(String message, Throwable e) {
+		System.err.println(message);
+		if(e != null) e.printStackTrace();
+	}
+
+	public static void logInfo(String string) {
+		System.out.println(string);
+	}
+
+	public static void logWarn(String string) {
+		System.out.println(string);		
+	}
+
+	public static boolean isWarnEnabled() {
+		return VERBOSE > 0;
+	}
+
+	public static boolean isInfoEnabled() {
+		return VERBOSE > 1;
+	}
+	
 }
