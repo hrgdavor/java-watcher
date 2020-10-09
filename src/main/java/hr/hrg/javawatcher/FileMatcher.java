@@ -2,8 +2,11 @@ package hr.hrg.javawatcher;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.concurrent.ArrayBlockingQueue;
 
-public interface FileMatcher {
+import io.methvin.watcher.DirectoryWatcher;
+
+public interface FileMatcher<F> {
 
 	/** The root path of the matcher. Files found and include/exclude rules are all relative to this path. */
 	public Path getRootPath();
@@ -55,7 +58,7 @@ public interface FileMatcher {
 	 * Get the current collection of files offered and accepted based on the rules.
 	 * You must {@link #setCollectMatched(boolean)} during initialisation, or the list will be empty.
 	 * */
-	public Collection<Path> getMatched();
+	public Collection<Path> getMatched(); 
 
 	/**
 	 * Are matched files for later listing. Use when you want to know what were collected.
@@ -63,5 +66,13 @@ public interface FileMatcher {
 	public void setCollectMatched(boolean collectMatched);
 
 	public Path relativize(Path path);
+
+	DirectoryWatcher getWatcher();
+
+	void setWatcher(DirectoryWatcher watcher);
+
+	F getContext();
+
+	ArrayBlockingQueue<FileChangeEntry<F>> getQ();
 	
 }

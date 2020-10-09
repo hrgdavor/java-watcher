@@ -233,5 +233,10 @@ public class Main {
 	public static boolean isInfoEnabled() {
 		return VERBOSE > 1;
 	}
+
+	public static <T> IFolderWatcher<T> makeWatcher() {
+		return new FolderWatcher<T>();
+//		return new FolderWatcherOld<T>();
+	}
 	
 }

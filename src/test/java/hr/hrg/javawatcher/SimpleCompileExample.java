@@ -31,7 +31,7 @@ public class SimpleCompileExample {
 			
 			while(!Thread.interrupted()){
 				
-				Collection<FileChangeEntry<FileMatchGlob>> changedFiles = watcher.takeOrNull();
+				Collection<FileChangeEntry<FileMatchGlob>> changedFiles = watcher.takeBatch(50);
 				if(changedFiles == null) break; // interrupted
 				
 				for (FileChangeEntry<FileMatchGlob> changed : changedFiles) {

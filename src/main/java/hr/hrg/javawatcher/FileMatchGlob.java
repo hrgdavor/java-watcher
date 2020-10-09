@@ -9,6 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
+
+import io.methvin.watcher.DirectoryWatcher;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -20,7 +23,7 @@ import java.util.TreeSet;
  * 
  *  @see <a href="https://docs.oracle.com/javase/tutorial/essential/io/fileOps.html#glob">What is a glob</a>
  *  */
-public class FileMatchGlob implements FileMatcher{
+public class FileMatchGlob<T> implements FileMatcher<T>{
 
 	private static final String NOT_COLLECTING_EXCLUDED = "This matcher is not collecting excluded files. Call setCollectExcluded(true) or override this method if you do not want exception thrown. ";
 
@@ -30,11 +33,15 @@ public class FileMatchGlob implements FileMatcher{
 
     protected String rootString;
     protected boolean recursive;
+    protected DirectoryWatcher watcher;
+	ArrayBlockingQueue<FileChangeEntry<T>> q = new ArrayBlockingQueue<>(4098);
+    
 	protected List<PathMatcher> includes = new ArrayList<>();
 	protected List<PathMatcher> excludes = new ArrayList<>();
 
 	protected volatile boolean started = false;
 	protected Path rootPath;
+	protected Path rootPathA;
 
 	/** Default: TRUE. If this matcher will collect matched Files.  */
 	protected boolean collectMatched = true;
@@ -42,10 +49,19 @@ public class FileMatchGlob implements FileMatcher{
 
 	/** Default: FALSE. If this matcher will collect unmatched Files.  */
 	protected boolean collectExcluded = false;
-	protected Set<Path> excluded = new TreeSet<>(); 
+	protected Set<Path> excluded = new TreeSet<>();
+
+	protected T context; 
 
 	public FileMatchGlob(Path root, boolean recursive){
-		this.rootPath = root;
+		this(root, null, recursive);
+	}
+	
+	public FileMatchGlob(Path root, T context, boolean recursive){
+		this.context = context;
+		this.rootPath = root.normalize();
+		rootPathA = rootPath.toAbsolutePath().normalize();
+		//rootPath = rootPath.toAbsolutePath().normalize();
 		this.recursive = recursive;
 		this.rootString = rootPath.toString().replace('\\', '/');
 	}
@@ -59,31 +75,31 @@ public class FileMatchGlob implements FileMatcher{
 	 * */
 	public PathMatcher makeRule(String rule){
 		if(rule.startsWith("regex:")) return FileSystems.getDefault().getPathMatcher(rule);
-		return FileSystems.getDefault().getPathMatcher("glob:"+rootString+"/"+rule);
+		return FileSystems.getDefault().getPathMatcher("glob:"+rule);
 	}
 
-	public FileMatchGlob includes(Collection<String> globs){
+	public FileMatchGlob<T> includes(Collection<String> globs){
 		for (String glob : globs) {
 			includes.add(makeRule(glob));
 		}
 		return this;
 	}
 
-	public FileMatchGlob includes(String ... globs){
+	public FileMatchGlob<T> includes(String ... globs){
 		for (String glob : globs) {
 			includes.add(makeRule(glob));
 		}
 		return this;
 	}
 
-	public FileMatchGlob excludes(Collection<String> globs){
+	public FileMatchGlob<T> excludes(Collection<String> globs){
 		for (String glob : globs) {
 			excludes.add(makeRule(glob));
 		}
 		return this;
 	}
 	
-	public FileMatchGlob excludes(String ... globs){
+	public FileMatchGlob<T> excludes(String ... globs){
 		for (String glob : globs) {
 			excludes.add(makeRule(glob));
 		}
@@ -110,12 +126,18 @@ public class FileMatchGlob implements FileMatcher{
 		return includes;
 	}
 	
+	@Override
+	public T getContext() {
+		return context;
+	}
+	
 	/** 
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Path relativize(Path path){
-		return rootPath.relativize(path);
+		if(!path.isAbsolute()) path = path.toAbsolutePath();
+		return rootPathA.relativize(path);
 	}
 
 	/** 
@@ -239,7 +261,29 @@ public class FileMatchGlob implements FileMatcher{
 	
 	/** {@inheritDoc} */
 	@Override
+	public DirectoryWatcher getWatcher() {
+		return watcher;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public void setWatcher(DirectoryWatcher watcher) {
+		this.watcher = watcher;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public ArrayBlockingQueue<FileChangeEntry<T>> getQ() {
+		return q;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
 	public String toString() {
 		return "FileMatchGlob:"+rootString;
+	}
+
+	public Path getRootPathAbs() {
+		return rootPathA;
 	}	
 }

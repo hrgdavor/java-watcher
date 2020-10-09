@@ -7,24 +7,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-/** Combination of single {@link FolderWatcher} and a {@link FileMatchGlob} to simplify simple watch situations*/
-public class GlobWatcher implements AutoCloseable{
-	FolderWatcher<FileMatchGlob> watcher = new FolderWatcher<FileMatchGlob>();
-	FileMatchGlob matcher;
-	
-	public Path relativize(Path path) {
-		return matcher.relativize(path);
-	}
-
-	public FileMatchGlob add(FileMatchGlob matcher) {
-		return watcher.add(matcher);
-	}
+/** Combination of single {@link FolderWatcherOld} and a {@link FileMatchGlob} to simplify simple watch situations*/
+public class GlobWatcher<T> implements AutoCloseable{
+	IFolderWatcher<T> watcher = Main.makeWatcher();
+	FileMatchGlob<T> matcher;
 
 	public GlobWatcher(Path root, boolean recursive) {
 		if(root == null) throw new NullPointerException("root must be defined");
-		matcher = new FileMatchGlob(root, recursive);
+		matcher = new FileMatchGlob<T>(root, recursive);
 		watcher.add(matcher);
 	}
 
@@ -33,33 +24,34 @@ public class GlobWatcher implements AutoCloseable{
 		this(root,true);
 	}
 
-	public static final Collection<Path> toPaths(Collection<FileChangeEntry<FileMatchGlob>> changes) {
+	
+	public Path relativize(Path path) {
+		return matcher.relativize(path);
+	}
+
+	public FileMatchGlob<T> add(FileMatchGlob<T> matcher) {
+		return watcher.add(matcher);
+	}
+		
+	public static final <T> Collection<Path> toPaths(Collection<FileChangeEntry<T>> changes) {
 		if(changes == null) return null;
 		Collection<Path> paths = new ArrayList<Path>(changes.size());
 		
-		for(FileChangeEntry<FileMatchGlob> p:changes) paths.add(p.getPath());
+		for(FileChangeEntry<T> p:changes) paths.add(p.getPath());
 		
 		return paths;
 	}
 	
-	public static final Collection<Path> toPathsUnique(Collection<FileChangeEntry<FileMatchGlob>> changes) {
+	public static final <T> Collection<Path> toPathsUnique(Collection<FileChangeEntry<T>> changes) {
 		if(changes == null) return null;
 		Collection<Path> paths = new HashSet<Path>(changes.size());
 		
-		for(FileChangeEntry<FileMatchGlob> p:changes) paths.add(p.getPath());
+		for(FileChangeEntry<T> p:changes) paths.add(p.getPath());
 		
 		return paths;
 	}
-	
-	public Collection<FileChangeEntry<FileMatchGlob>> poll(){
-		return watcher.poll();
-	}
 
-	public Collection<Path> pollFiles(){
-		return toPaths(watcher.poll());
-	}
-
-	public Collection<FileChangeEntry<FileMatchGlob>> takeBatch(long burstDelay) {
+	public Collection<FileChangeEntry<T>> takeBatch(long burstDelay) {
 		return watcher.takeBatch(burstDelay);
 	}
 	
@@ -71,31 +63,7 @@ public class GlobWatcher implements AutoCloseable{
 		return toPathsUnique(watcher.takeBatch(burstDelay));
 	}
 
-	public Collection<FileChangeEntry<FileMatchGlob>> poll(long timeout, TimeUnit unit) throws InterruptedException {
-		return watcher.poll(timeout, unit);
-	}
-	
-	public Collection<Path> pollFiles(long timeout, TimeUnit unit) throws InterruptedException {
-		return toPaths(watcher.poll(timeout, unit));
-	}
-
-	public Collection<FileChangeEntry<FileMatchGlob>> take() throws InterruptedException {
-		return watcher.take();
-	}
-	
-	public Collection<Path> takeFiles() throws InterruptedException {
-		return toPaths(watcher.take());
-	}
-
-	public Collection<FileChangeEntry<FileMatchGlob>> takeOrNull() {
-		return watcher.takeOrNull();
-	}
-	
-	public Collection<Path> takeOrNullFiles() {
-		return toPaths(watcher.takeOrNull());
-	}
-
-	public Collection<FileChangeEntry<FileMatchGlob>> getMatched() {
+	public Collection<FileChangeEntry<T>> getMatched() {
 		return watcher.getMatched();
 	}
 
@@ -111,19 +79,19 @@ public class GlobWatcher implements AutoCloseable{
 		watcher.init(registerForWatch);
 	}
 
-	public FileMatchGlob includes(Collection<String> globs) {
+	public FileMatchGlob<T> includes(Collection<String> globs) {
 		return matcher.includes(globs);
 	}
 
-	public FileMatchGlob includes(String... globs) {
+	public FileMatchGlob<T> includes(String... globs) {
 		return matcher.includes(globs);
 	}
 
-	public FileMatchGlob excludes(Collection<String> globs) {
+	public FileMatchGlob<T> excludes(Collection<String> globs) {
 		return matcher.excludes(globs);
 	}
 
-	public FileMatchGlob excludes(String... globs) {
+	public FileMatchGlob<T> excludes(String... globs) {
 		return matcher.excludes(globs);
 	}
 
@@ -169,6 +137,10 @@ public class GlobWatcher implements AutoCloseable{
 
 	public Path getRootPath() {
 		return matcher.getRootPath();
+	}
+	
+	public Path getRootPathAbs() {
+		return matcher.getRootPathAbs();
 	}
 
 	public boolean isRecursive() {

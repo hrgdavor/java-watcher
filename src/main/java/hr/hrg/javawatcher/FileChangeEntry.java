@@ -7,18 +7,18 @@ import java.nio.file.Path;
  * Container for information regarding the changed file.
  * 
  * */
-public class FileChangeEntry<T extends FileMatcher> {
+public class FileChangeEntry<T> {
 	
 	/** @see {@link #getPath()} */
 	private final Path file;
 
 	/** @see {@link #getMatcher()} */
-	private final T matcher;
+	private final FileMatcher<T> matcher;
 
 	/** @see {@link #getType()} */
 	private final FileChangeType type;
 
-	public FileChangeEntry(Path file, FileChangeType type, T matcher) {
+	public FileChangeEntry(Path file, FileChangeType type, FileMatcher<T> matcher) {
 		this.file = file;
 		this.type = type;
 		this.matcher = matcher;
@@ -30,15 +30,19 @@ public class FileChangeEntry<T extends FileMatcher> {
 	}
 	
 	/** FolderGlob that was listening for changes on this file when change occurred */
-	public T getMatcher() {
+	public FileMatcher<T> getMatcher() {
 		return matcher;
+	}
+	
+	public T getContext() {
+		return matcher.getContext();
 	}
 	
 	/** type of change */
 	public FileChangeType getType() {
 		return type;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
