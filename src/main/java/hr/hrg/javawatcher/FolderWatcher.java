@@ -302,7 +302,7 @@ public class FolderWatcher<T> implements AutoCloseable, IFolderWatcher<T> {
 			Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					matcher.offer(file);
+					matcher.offer(matcher.relativize(file));
 					return FileVisitResult.CONTINUE;
 				}
 				
