@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 //import org.slf4j.Logger;
@@ -20,6 +21,7 @@ public class Main {
 	public static int VERBOSE = 0;
 
 	static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	static AtomicInteger taskSeq = new AtomicInteger();
 	
 	public static void main(String[] args) throws Exception{
 
@@ -63,6 +65,10 @@ public class Main {
 			runScript(log,commandToRun, null, changed, postChanges, System.out, System.err);
 		}
 		
+	}
+	
+	public static int nextId() {
+		return taskSeq.incrementAndGet();
 	}
 
 	public static void runHttp(Logger log, String command, Collection<Path> changed, boolean postChanges, PrintStream out) throws Exception{
@@ -211,11 +217,18 @@ public class Main {
         }
         sb.append('"');
         return sb.toString();
-    }	
+    }
 
 	public static void logError(String message, Throwable e) {
 		System.err.println(message);
 		if(e != null) e.printStackTrace();
+	}
+
+	public static void logError(Path path, String message, Exception e) {
+		System.err.println(path);
+		System.err.println(message);
+		if(e != null) e.printStackTrace();
+		
 	}
 
 	public static void logInfo(String string) {
@@ -237,6 +250,14 @@ public class Main {
 	public static <T> IFolderWatcher<T> makeWatcher() {
 		return new FolderWatcher<T>();
 //		return new FolderWatcherOld<T>();
+	}
+
+	public static void logSkipIdentical(long taskId, Path to) {
+		if(isInfoEnabled()) logInfo("skip identical: "+to);		
+	}
+
+	public static void logSkipOlder(long taskId, Path to) {
+		if(isInfoEnabled()) logInfo("skip identical: "+to);		
 	}
 	
 }
